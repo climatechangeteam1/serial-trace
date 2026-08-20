@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -25,21 +25,29 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        html,
+        body {
             width: 100%;
+            min-width: 0;
             min-height: 100%;
             margin: 0;
             padding: 0;
+        }
+        body {
             background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Cairo', sans-serif;
+            overflow-y: auto;
             overflow-x: hidden;
+            min-height: 100vh;
             background-image:
                 radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 80% 60%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
         }
-
-        button, input, textarea, select {
+        button,
+        input,
+        textarea,
+        select {
             font-family: inherit;
         }
 
@@ -53,12 +61,20 @@
             display: inline-block;
         }
 
+        .dir-ltr {
+            direction: ltr;
+            text-align: left;
+        }
+
         .dir-rtl {
             direction: rtl;
             text-align: right;
         }
 
-        /* Glassmorphism */
+        /* =========================================================
+           GLASS
+           ========================================================= */
+
         .glass {
             background: var(--panel-bg);
             backdrop-filter: blur(16px);
@@ -82,22 +98,70 @@
             transform: translateY(-2px);
         }
 
-        /* Screen Management Fixes */
+        .glass-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .glass-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255,255,255,0.05),
+                transparent
+            );
+            transform: rotate(45deg);
+            transition: 0.5s;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .glass-btn:hover::after {
+            opacity: 1;
+            left: 100%;
+            top: 100%;
+        }
+
+        /* =========================================================
+           SCREEN MANAGEMENT
+           ========================================================= */
+
         .screen {
             position: fixed;
             inset: 0;
             width: 100%;
             height: 100dvh;
+            min-height: 100vh;
+
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.35s ease, transform 0.35s ease;
+
+            transition:
+                opacity 0.35s ease,
+                transform 0.35s ease;
+
             transform: scale(0.985);
+
             display: flex;
             flex-direction: column;
+
             overflow-x: hidden;
-            overflow-y: auto;
-            padding: max(1.5rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+            overflow-y: auto !important;
+
+            padding:
+                max(1rem, env(safe-area-inset-top))
+                max(1rem, env(safe-area-inset-right))
+                max(1rem, env(safe-area-inset-bottom))
+                max(1rem, env(safe-area-inset-left));
+
             z-index: 0;
+
             overscroll-behavior: contain;
             -webkit-overflow-scrolling: touch;
         }
@@ -109,18 +173,20 @@
             z-index: 10;
         }
 
-        #screen-briefing {
-            justify-content: flex-start;
-            align-items: center;
+        /* Investigation and communication pages allow page scroll when tall */
+        #screen-investigation,
+        #screen-interrogation,
+        #screen-assistant,
+        #screen-team-chat,
+        #screen-evidence-board {
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
         }
 
-        #screen-briefing .glass {
-            margin-top: auto;
-            margin-bottom: auto;
-            height: auto;
-        }
+        /* =========================================================
+           SCROLLBARS
+           ========================================================= */
 
-        /* Scrollbars */
         * {
             scrollbar-width: thin;
             scrollbar-color: var(--neon-cyan) rgba(0,0,0,0.3);
@@ -140,8 +206,21 @@
             border-radius: 3px;
         }
 
-        .text-glow-blue { text-shadow: 0 0 10px var(--neon-blue); }
-        .text-glow-red { text-shadow: 0 0 10px var(--neon-red); }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #22d3ee;
+        }
+
+        .text-glow-blue {
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .text-glow-red {
+            text-shadow: 0 0 10px var(--neon-red);
+        }
+
+        /* =========================================================
+           STATUS BARS
+           ========================================================= */
 
         .status-bar-bg {
             background: rgba(255,255,255,0.1);
@@ -152,22 +231,243 @@
 
         .status-bar-fill {
             height: 100%;
-            transition: width 0.5s ease;
+            transition:
+                width 0.5s ease,
+                background 0.5s ease;
         }
 
-        /* Responsive Fixes */
+        /* =========================================================
+           EVIDENCE BOARD
+           ========================================================= */
+
+        #board-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .evidence-node {
+            z-index: 2;
+            position: absolute;
+            cursor: grab;
+            max-width: 220px;
+            user-select: none;
+            word-break: break-word;
+        }
+
+        .evidence-node:active {
+            cursor: grabbing;
+        }
+
+        /* =========================================================
+           SCANLINES
+           ========================================================= */
+
+        .scanline {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(
+                    to bottom,
+                    rgba(255,255,255,0),
+                    rgba(255,255,255,0) 50%,
+                    rgba(0,0,0,0.1) 50%,
+                    rgba(0,0,0,0.1)
+                );
+            background-size: 100% 4px;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        /* =========================================================
+           INTERNAL SCROLL AREAS
+           ========================================================= */
+
+        #discovered-evidence-list,
+        #inter-chat-log,
+        #ai-chat-log,
+        #team-chat-log {
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* =========================================================
+           MOBILE / TABLET
+           ========================================================= */
+
         @media (max-width: 768px) {
             .screen {
-                padding: max(0.85rem, env(safe-area-inset-top)) max(0.85rem, env(safe-area-inset-right)) max(0.85rem, env(safe-area-inset-bottom)) max(0.85rem, env(safe-area-inset-left));
-                overflow-y: auto !important; /* ضمان إمكانية التمرير في كل الشاشات على الموبايل */
+                padding:
+                    max(0.85rem, env(safe-area-inset-top))
+                    max(0.85rem, env(safe-area-inset-right))
+                    max(0.85rem, env(safe-area-inset-bottom))
+                    max(0.85rem, env(safe-area-inset-left));
+            }
+
+            #screen-home {
+                justify-content: center;
+                overflow-y: auto;
             }
 
             #screen-home h1 {
-                font-size: clamp(2.5rem, 10vw, 4rem);
+                font-size: clamp(2.7rem, 13vw, 4.5rem);
+                line-height: 1;
+                word-break: break-word;
+            }
+
+            #screen-home h2 {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            #global-back {
+                top: max(10px, env(safe-area-inset-top));
+                right: max(10px, env(safe-area-inset-right));
+            }
+
+            #screen-investigation {
+                overflow-y: auto;
+            }
+
+            #screen-investigation .grid {
+                flex-shrink: 0;
             }
 
             #screen-investigation .glass.flex-1 {
-                min-height: 250px;
+                min-height: 220px;
+                flex: none;
+            }
+
+            #screen-interrogation,
+            #screen-assistant,
+            #screen-team-chat {
+                overflow: hidden;
+            }
+
+            #screen-interrogation > div,
+            #screen-assistant > div,
+            #screen-team-chat > div {
+                min-height: 0;
+            }
+
+            #inter-chat-log,
+            #ai-chat-log,
+            #team-chat-log {
+                min-height: 0;
+                flex: 1 1 auto;
+            }
+
+            #screen-evidence-board {
+                overflow: hidden;
+            }
+
+            #board-container {
+                min-height: 0;
+            }
+
+            .evidence-node {
+                max-width: 170px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .screen {
+                padding:
+                    max(0.65rem, env(safe-area-inset-top))
+                    max(0.65rem, env(safe-area-inset-right))
+                    max(0.65rem, env(safe-area-inset-bottom))
+                    max(0.65rem, env(safe-area-inset-left));
+            }
+
+            #screen-map > .flex:first-child,
+            #screen-suspects > .flex:first-child {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                margin-bottom: 1.25rem;
+            }
+
+            #screen-map h2 {
+                font-size: 1.5rem;
+            }
+
+            #screen-suspects h2 {
+                font-size: 1.5rem;
+            }
+
+            #screen-briefing .glass {
+                padding: 1.1rem;
+            }
+
+            #screen-briefing h2 {
+                font-size: 1.7rem;
+                padding-top: 1rem;
+            }
+
+            #screen-briefing .flex.gap-4 {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            #screen-investigation .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.6rem;
+            }
+
+            #screen-investigation .grid button {
+                padding: 0.8rem;
+                min-height: 120px;
+            }
+
+            #screen-investigation .grid button i {
+                font-size: 1.8rem;
+            }
+
+            #screen-investigation .grid button span {
+                font-size: 0.82rem;
+            }
+
+            #inter-suspect-name {
+                font-size: 1.15rem;
+            }
+
+            #screen-interrogation .grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            #screen-interrogation .glass.p-4 {
+                padding: 0.75rem;
+            }
+
+            #screen-interrogation .glass.p-3,
+            #screen-assistant .glass.p-3,
+            #screen-team-chat .glass.p-3 {
+                padding: 0.5rem;
+            }
+
+            #inter-input,
+            #ai-input,
+            #team-input {
+                min-width: 0;
+            }
+
+            #screen-evidence-board h2 {
+                font-size: 1.05rem;
+            }
+
+            #screen-evidence-board .text-sm {
+                display: none;
             }
         }
     </style>
@@ -177,229 +477,553 @@
 
     <div class="scanline"></div>
 
-    <button id="global-back" type="button" onclick="goBack()" aria-label="رجوع" style="display:none; position:fixed; top:14px; right:14px; z-index:10000; background:rgba(10,15,29,.92); color:#e2e8f0; border:1px solid rgba(6,182,212,.35); padding:9px 14px; border-radius:12px; cursor:pointer; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);">
+    <button
+        id="global-back"
+        type="button"
+        onclick="goBack()"
+        aria-label="رجوع"
+        style="
+            display:none;
+            position:fixed;
+            top:14px;
+            right:14px;
+            z-index:10000;
+            background:rgba(10,15,29,.92);
+            color:#e2e8f0;
+            border:1px solid rgba(6,182,212,.35);
+            padding:9px 14px;
+            border-radius:12px;
+            font-family:Cairo,sans-serif;
+            cursor:pointer;
+            backdrop-filter:blur(10px);
+        "
+    >
         ↩ رجوع
     </button>
 
-    <!-- HOME SCREEN -->
+    <!-- =========================================================
+         1. HOME SCREEN
+         ========================================================= -->
+
     <div id="screen-home" class="screen active justify-center items-center">
+
         <div class="text-center max-w-2xl w-full">
-            <h1 class="text-6xl font-bold font-en text-glow-blue mb-2 tracking-widest uppercase">Serial Trace</h1>
-            <h2 class="text-xl text-blue-400 mb-8 tracking-wider">DETECTIVE PARTY MYSTERY</h2>
+
+            <h1 class="text-7xl font-bold font-en text-glow-blue mb-2 tracking-widest uppercase">
+                Serial Trace
+            </h1>
+
+            <h2 class="text-2xl text-blue-400 mb-12 tracking-wider">
+                DETECTIVE PARTY MYSTERY
+            </h2>
+
             <div class="space-y-4 w-64 max-w-full mx-auto">
-                <button onclick="switchScreen('screen-map')" class="glass-btn w-full py-4 rounded font-bold text-lg tracking-wider">
+
+                <button
+                    onclick="switchScreen('screen-map')"
+                    class="glass-btn w-full py-4 rounded font-bold text-lg tracking-wider"
+                >
                     <span class="font-en">START / MAP</span><br>
-                    <span class="text-sm font-normal text-blue-300">الخريطة والملفات</span>
+                    <span class="text-sm font-normal text-blue-300">
+                        الخريطة والملفات
+                    </span>
                 </button>
-                <button onclick="resetSave()" class="glass-btn w-full py-3 rounded text-red-400 border-red-900/50 hover:border-red-500">
+
+                <button
+                    onclick="alert('Settings: Coming soon (Audio, Voice toggles)')"
+                    class="glass-btn w-full py-4 rounded font-bold text-lg tracking-wider"
+                >
+                    <span class="font-en">SETTINGS</span><br>
+                    <span class="text-sm font-normal text-blue-300">
+                        الإعدادات
+                    </span>
+                </button>
+
+                <button
+                    onclick="resetSave()"
+                    class="glass-btn w-full py-3 rounded text-red-400 border-red-900/50 hover:border-red-500"
+                >
                     <span class="font-en text-sm">RESET DATA</span>
                 </button>
+
             </div>
         </div>
     </div>
 
-    <!-- MAP SCREEN -->
+    <!-- =========================================================
+         2. MAP / CASE SELECT
+         ========================================================= -->
+
     <div id="screen-map" class="screen">
+
         <div class="flex justify-between items-center gap-4 mb-8 flex-shrink-0">
-            <h2 class="text-3xl font-bold font-en text-glow-blue"><i class="fas fa-map-marked-alt ml-3"></i>DATABASE / MAP</h2>
-            <button onclick="switchScreen('screen-home')" class="glass-btn px-6 py-2 rounded flex-shrink-0">عودة <i class="fas fa-arrow-left mr-2"></i></button>
+
+            <h2 class="text-4xl font-bold font-en text-glow-blue">
+                <i class="fas fa-map-marked-alt mr-3"></i>
+                DATABASE / MAP
+            </h2>
+
+            <button
+                onclick="switchScreen('screen-home')"
+                class="glass-btn px-6 py-2 rounded flex-shrink-0"
+            >
+                <i class="fas fa-arrow-right ml-2"></i>
+                عودة
+            </button>
+
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6" id="cases-grid">
-            <div class="glass p-6 rounded-xl border-cyan-500/30">
-                <h3 class="text-2xl font-bold text-cyan-400 mb-2">لغز الرسالة المشفرة</h3>
-                <p class="text-gray-400 text-sm mb-4">اختراق سيرفرات شركة ألفا تك وسرقة الشفرة الرئيسية.</p>
-                <button onclick="switchScreen('screen-briefing')" class="glass-btn w-full py-2 rounded text-cyan-300">فتح الملف</button>
-            </div>
+
+        <div
+            class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6"
+            id="cases-grid"
+        >
+            <!-- Cases generated via JS -->
         </div>
+
     </div>
 
-    <!-- BRIEFING SCREEN -->
+    <!-- =========================================================
+         3. CASE BRIEFING
+         ========================================================= -->
+
     <div id="screen-briefing" class="screen">
-        <div class="glass p-8 rounded-xl max-w-4xl mx-auto w-full relative my-auto">
-            <div class="absolute top-0 left-0 bg-blue-600/20 px-4 py-1 rounded-br-lg border-b border-r border-blue-500/30 text-blue-300 font-en" id="briefing-id">CASE-001</div>
-            <h2 class="text-4xl font-bold mb-2 text-cyan-400 mt-2" id="briefing-title">لغز الرسالة المشفرة</h2>
+
+        <div class="glass p-8 rounded-xl max-w-4xl mx-auto w-full relative overflow-hidden my-auto">
+
+            <div
+                class="absolute top-0 right-0 bg-blue-600/20 px-4 py-1 rounded-bl-lg border-b border-l border-blue-500/30 text-blue-300 font-en"
+                id="briefing-id"
+            >
+                CASE-001
+            </div>
+
+            <h2
+                class="text-4xl font-bold mb-2 text-cyan-400"
+                id="briefing-title"
+            >
+                العنوان
+            </h2>
+
             <div class="flex flex-wrap gap-4 text-sm text-gray-400 mb-6 border-b border-white/10 pb-4">
-                <span><i class="fas fa-map-marker-alt text-blue-400"></i> القاهرة - شركة تقنية بالمعادي</span>
-                <span><i class="fas fa-clock text-blue-400"></i> الوقت المتاح: 20 دقيقة</span>
+
+                <span>
+                    <i class="fas fa-map-marker-alt text-blue-400"></i>
+                    <span id="briefing-loc">المكان</span>
+                </span>
+
+                <span>
+                    <i class="fas fa-clock text-blue-400"></i>
+                    <span id="briefing-time">الوقت</span>
+                </span>
+
+                <span>
+                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                    Difficulty:
+                    <span id="briefing-diff" class="font-en">HARD</span>
+                </span>
+
             </div>
-            <p class="text-gray-200 mb-6 leading-relaxed">تم اختراق الخوادم الرئيسية للشركة في جنح الظلام، وتمت سرقة شفرة برمجية لمنتج سري تقدر قيمته بملايين الدولارات. الجاني ترك رسالة مشفرة ساخرة على الشاشة الرئيسية.</p>
+
+            <div class="space-y-6 text-lg leading-relaxed mb-8">
+
+                <div>
+                    <h3 class="text-blue-400 font-bold mb-2">
+                        <i class="fas fa-book-open"></i>
+                        ملخص القضية (Story)
+                    </h3>
+
+                    <p id="briefing-story" class="text-gray-200">
+                        القصة...
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-red-400 font-bold mb-2">
+                        <i class="fas fa-bolt"></i>
+                        البلاغ الأولي (Incident)
+                    </h3>
+
+                    <p id="briefing-incident" class="text-gray-200">
+                        البلاغ...
+                    </p>
+                </div>
+
+            </div>
+
             <div class="text-center">
-                <button onclick="beginInvestigation()" class="glass-btn px-12 py-4 rounded-lg font-bold text-xl text-cyan-300">بدء التحقيق <i class="fas fa-play mr-2"></i></button>
+
+                <button
+                    onclick="beginInvestigation()"
+                    class="glass-btn px-12 py-4 rounded-lg font-bold text-xl text-cyan-300 hover:text-white transition shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                >
+                    بدء التحقيق
+                    <i class="fas fa-play mr-2"></i>
+                </button>
+
             </div>
+
         </div>
     </div>
 
-    <!-- INVESTIGATION HUB -->
+    <!-- =========================================================
+         4. INVESTIGATION HUB
+         ========================================================= -->
+
     <div id="screen-investigation" class="screen">
+
         <div class="flex justify-between items-center gap-4 mb-6 flex-shrink-0">
-            <div>
-                <h2 class="text-2xl font-bold text-cyan-400 mb-1" id="hub-case-title">القضية: لغز الرسالة المشفرة</h2>
-                <div class="text-red-400 font-en text-lg font-bold"><i class="fas fa-stopwatch"></i> <span id="case-timer">20:00</span></div>
+
+            <div class="min-w-0">
+
+                <h2
+                    class="text-3xl font-bold text-cyan-400 mb-1 truncate"
+                    id="hub-case-title"
+                >
+                    القضية
+                </h2>
+
+                <div class="text-red-400 font-en text-xl font-bold tracking-widest">
+                    <i class="fas fa-stopwatch"></i>
+                    <span id="case-timer">45:00</span>
+                </div>
+
             </div>
-            <button onclick="switchScreen('screen-team-chat')" class="glass-btn px-4 py-2 rounded text-purple-300"><i class="fas fa-comments ml-2"></i>نقاش الفريق</button>
+
+            <div class="flex gap-3 flex-shrink-0">
+
+                <button
+                    onclick="switchScreen('screen-team-chat')"
+                    class="glass-btn px-4 py-2 rounded text-purple-300"
+                >
+                    <i class="fas fa-comments ml-2"></i>
+                    نقاش الفريق
+                </button>
+
+                <button
+                    onclick="switchScreen('screen-map')"
+                    class="glass-btn px-4 py-2 rounded text-gray-400"
+                >
+                    <i class="fas fa-times"></i>
+                </button>
+
+            </div>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 flex-shrink-0">
-            <button onclick="searchArea('cameras')" class="glass glass-btn p-4 rounded-xl flex flex-col items-center gap-2">
-                <i class="fas fa-video text-3xl text-blue-400"></i>
-                <span class="font-bold text-sm">الكاميرات</span>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 flex-shrink-0">
+
+            <button
+                onclick="searchArea('cameras')"
+                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
+            >
+                <i class="fas fa-video text-4xl text-blue-400"></i>
+                <span class="font-bold text-lg">مراجعة الكاميرات</span>
+                <span class="text-xs font-en text-gray-400">CAMERAS</span>
             </button>
-            <button onclick="searchArea('location')" class="glass glass-btn p-4 rounded-xl flex flex-col items-center gap-2">
-                <i class="fas fa-search-location text-3xl text-blue-400"></i>
-                <span class="font-bold text-sm">الموقع</span>
+
+            <button
+                onclick="searchArea('location')"
+                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
+            >
+                <i class="fas fa-search-location text-4xl text-blue-400"></i>
+                <span class="font-bold text-lg">فحص الموقع</span>
+                <span class="text-xs font-en text-gray-400">LOCATION</span>
             </button>
-            <button onclick="searchArea('documents')" class="glass glass-btn p-4 rounded-xl flex flex-col items-center gap-2">
-                <i class="fas fa-file-alt text-3xl text-blue-400"></i>
-                <span class="font-bold text-sm">الوثائق</span>
+
+            <button
+                onclick="searchArea('documents')"
+                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
+            >
+                <i class="fas fa-file-alt text-4xl text-blue-400"></i>
+                <span class="font-bold text-lg">مراجعة الوثائق</span>
+                <span class="text-xs font-en text-gray-400">DOCUMENTS</span>
             </button>
-            <button onclick="switchScreen('screen-suspects')" class="glass glass-btn p-4 rounded-xl flex flex-col items-center gap-2 border-cyan-500/50">
-                <i class="fas fa-user-secret text-3xl text-cyan-400"></i>
-                <span class="font-bold text-sm">المشتبه بهم</span>
+
+            <button
+                onclick="switchScreen('screen-suspects')"
+                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-cyan-500/50"
+            >
+                <i class="fas fa-user-secret text-4xl text-cyan-400"></i>
+                <span class="font-bold text-lg">المشتبه بهم والاستجواب</span>
+                <span class="text-xs font-en text-gray-400">SUSPECTS</span>
             </button>
+
+            <button
+                onclick="switchScreen('screen-evidence-board')"
+                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-purple-500/50"
+            >
+                <i class="fas fa-project-diagram text-4xl text-purple-400"></i>
+                <span class="font-bold text-lg">لوحة الأدلة والربط</span>
+                <span class="text-xs font-en text-gray-400">EVIDENCE BOARD</span>
+            </button>
+
+            <button
+                onclick="switchScreen('screen-assistant')"
+                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
+            >
+                <i class="fas fa-robot text-4xl text-blue-400"></i>
+                <span class="font-bold text-lg">المساعد الذكي</span>
+                <span class="text-xs font-en text-gray-400">AI ASSISTANT</span>
+            </button>
+
+            <button
+                onclick="searchArea('timeline')"
+                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
+            >
+                <i class="fas fa-history text-4xl text-blue-400"></i>
+                <span class="font-bold text-lg">تحليل التايم لاين</span>
+                <span class="text-xs font-en text-gray-400">TIMELINE</span>
+            </button>
+
+            <button
+                onclick="switchScreen('screen-accusation')"
+                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-red-500/50 bg-red-900/10"
+            >
+                <i class="fas fa-gavel text-4xl text-red-400"></i>
+                <span class="font-bold text-lg">توجيه الاتهام النهائي</span>
+                <span class="text-xs font-en text-gray-400">FINAL ACCUSATION</span>
+            </button>
+
         </div>
 
-        <div class="glass p-6 rounded-xl flex-1 min-h-[250px] overflow-hidden flex flex-col">
-            <h3 class="text-lg font-bold mb-4 text-cyan-300 flex-shrink-0"><i class="fas fa-folder-open ml-2"></i>الأدلة المكتشفة</h3>
-            <div id="discovered-evidence-list" class="overflow-y-auto space-y-3 pr-2 flex-1"></div>
+        <div class="glass p-6 rounded-xl flex-1 min-h-0 overflow-hidden flex flex-col">
+
+            <h3 class="text-xl font-bold mb-4 text-cyan-300 flex-shrink-0">
+                <i class="fas fa-folder-open ml-2"></i>
+                الأدلة المكتشفة
+            </h3>
+
+            <div
+                id="discovered-evidence-list"
+                class="overflow-y-auto overflow-x-hidden space-y-3 pr-2 flex-1 min-h-0"
+            >
+                <!-- Populated via JS -->
+            </div>
+
         </div>
     </div>
 
-    <!-- SUSPECTS & CHAT SETUP -->
+    <!-- =========================================================
+         5. EVIDENCE BOARD
+         ========================================================= -->
+
+    <div id="screen-evidence-board" class="screen bg-[#020305]">
+
+        <div class="flex justify-between items-center gap-4 mb-4 z-10 flex-shrink-0">
+
+            <h2 class="text-2xl font-bold text-purple-400">
+                <i class="fas fa-project-diagram ml-2"></i>
+                لوحة الربط (Evidence Board)
+            </h2>
+
+            <div class="text-sm text-gray-400 text-center">
+                انقر على عنصرين لربطهما
+                <span class="font-en">
+                    (Click two items to connect)
+                </span>
+            </div>
+
+            <button
+                onclick="switchScreen('screen-investigation')"
+                class="glass-btn px-4 py-2 rounded flex-shrink-0"
+            >
+                عودة
+                <i class="fas fa-arrow-left mr-2"></i>
+            </button>
+
+        </div>
+
+        <div
+            id="board-container"
+            class="relative flex-1 min-h-0 glass rounded-xl overflow-hidden border-purple-900/30"
+        >
+
+            <canvas id="board-canvas"></canvas>
+
+            <div
+                id="board-nodes"
+                class="absolute inset-0 overflow-hidden"
+            >
+                <!-- Nodes populated here -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- =========================================================
+         6. SUSPECTS LIST
+         ========================================================= -->
+
     <div id="screen-suspects" class="screen">
+
         <div class="flex justify-between items-center gap-4 mb-8 flex-shrink-0">
-            <h2 class="text-3xl font-bold text-cyan-400"><i class="fas fa-users ml-2"></i>المشتبه بهم</h2>
-            <button onclick="switchScreen('screen-investigation')" class="glass-btn px-4 py-2 rounded">عودة</button>
+
+            <h2 class="text-3xl font-bold text-cyan-400">
+                <i class="fas fa-users ml-2"></i>
+                المشتبه بهم
+            </h2>
+
+            <button
+                onclick="switchScreen('screen-investigation')"
+                class="glass-btn px-4 py-2 rounded flex-shrink-0"
+            >
+                عودة
+                <i class="fas fa-arrow-left mr-2"></i>
+            </button>
+
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="suspects-grid">
-            <div class="glass p-6 rounded-xl flex flex-col items-center text-center">
-                <div class="w-20 h-20 rounded-full bg-gray-800 border-2 border-cyan-500 flex items-center justify-center text-3xl mb-4"><i class="fas fa-user text-gray-400"></i></div>
-                <h3 class="text-xl font-bold text-white mb-1">أحمد علي</h3>
-                <p class="text-sm text-gray-400 mb-4">مهندس الخوادم للنظام</p>
-                <button onclick="switchScreen('screen-interrogation')" class="glass-btn w-full py-2 rounded text-cyan-300 font-bold">بدء الاستجواب</button>
-            </div>
+
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6"
+            id="suspects-grid"
+        >
+            <!-- Populated via JS -->
         </div>
+
     </div>
+
+    <!-- =========================================================
+         7. INTERROGATION SCREEN
+         ========================================================= -->
 
     <div id="screen-interrogation" class="screen">
-        <div class="flex flex-col h-full max-w-4xl mx-auto w-full gap-4">
+
+        <div class="flex flex-col min-h-0 h-full max-w-5xl mx-auto w-full gap-4">
+
             <div class="flex justify-between items-center flex-shrink-0">
-                <button onclick="switchScreen('screen-suspects')" class="glass-btn px-4 py-2 rounded text-sm">رجوع للمشتبه بهم</button>
+
+                <button
+                    onclick="switchScreen('screen-suspects')"
+                    class="glass-btn px-4 py-2 rounded text-sm"
+                >
+                    <i class="fas fa-arrow-right ml-2"></i>
+                    المشتبه بهم
+                </button>
+
+                <div
+                    class="font-en text-red-400 font-bold"
+                    id="interrogation-timer"
+                >
+                    45:00
+                </div>
+
             </div>
-            <div class="glass rounded-xl flex-1 min-h-[300px] flex flex-col overflow-hidden p-4">
-                <div id="inter-chat-log" class="flex-1 space-y-4 overflow-y-auto pr-2 mb-4">
-                    <div class="bg-blue-950/40 p-3 rounded-lg border border-blue-800/40 max-w-[80%]">
-                        <span class="text-xs text-blue-400 block mb-1">أحمد علي</span>
-                        <p class="text-sm">أنا تحت أمرك، مستعد لأي سؤال عشان نثبت براءتي.</p>
+
+            <!-- Suspect Header -->
+
+            <div class="glass p-4 rounded-xl flex items-center gap-6 border-l-4 border-cyan-500 flex-shrink-0">
+
+                <div class="w-20 h-20 rounded-full bg-gray-800 border-2 border-cyan-500 flex items-center justify-center text-3xl flex-shrink-0">
+                    <i class="fas fa-user text-gray-400"></i>
+                </div>
+
+                <div class="flex-1 min-w-0">
+
+                    <h2
+                        class="text-2xl font-bold text-white mb-1 truncate"
+                        id="inter-suspect-name"
+                    >
+                        الاسم
+                    </h2>
+
+                    <p
+                        class="text-sm text-gray-400 mb-2 truncate"
+                        id="inter-suspect-job"
+                    >
+                        الوظيفة
+                    </p>
+
+                    <div class="grid grid-cols-3 gap-4 text-sm font-en">
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>Stress</span>
+                                <span id="inter-stress-val">0%</span>
+                            </div>
+
+                            <div class="status-bar-bg">
+                                <div
+                                    id="inter-stress-bar"
+                                    class="status-bar-fill bg-green-500"
+                                    style="width:0%"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>Cooperation</span>
+                                <span id="inter-coop-val">100%</span>
+                            </div>
+
+                            <div class="status-bar-bg">
+                                <div
+                                    id="inter-coop-bar"
+                                    class="status-bar-fill bg-blue-500"
+                                    style="width:100%"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>Status</span>
+                            </div>
+
+                            <div
+                                id="inter-status-text"
+                                class="font-bold text-green-400"
+                            >
+                                CALM
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-                <div class="flex gap-2 flex-shrink-0 pt-2 border-t border-white/10">
-                    <input type="text" id="inter-input" placeholder="وجه سؤالك..." class="flex-1 bg-black/40 border border-white/10 rounded px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" onkeypress="if(event.key==='Enter') sendInterrogationMessage()">
-                    <button onclick="sendInterrogationMessage()" class="glass-btn px-6 py-2 rounded text-cyan-300 font-bold text-sm">إرسال</button>
+            </div>
+
+            <!-- Chat Area -->
+
+            <div
+                class="glass flex-1 min-h-0 rounded-xl p-4 overflow-y-auto overflow-x-hidden flex flex-col gap-4 dir-ltr"
+                id="inter-chat-log"
+            >
+                <div class="text-center text-gray-500 text-sm mb-4 flex-shrink-0">
+                    -- Session Started --
                 </div>
             </div>
+
+            <!-- Input Area -->
+
+            <div class="glass p-3 rounded-xl flex gap-3 dir-ltr flex-shrink-0">
+
+                <button
+                    onclick="toggleVoice()"
+                    id="btn-voice"
+                    class="glass-btn w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center text-gray-400 hover:text-cyan-400"
+                    title="Toggle Voice (TTS)"
+                >
+                    <i class="fas fa-volume-up"></i>
+                </button>
+
+                <input
+                    type="text"
+                    id="inter-input"
+                    class="flex-1 min-w-0 bg-black/50 border border-white/10 rounded-lg px-4 text-white focus:outline-none focus:border-cyan-500 text-right dir-rtl"
+                    placeholder="اطرح سؤالاً..."
+                    onkeydown="if(event.key === 'Enter') sendInterrogationMessage()"
+                >
+
+                <button
+                    onclick="sendInterrogationMessage()"
+                    class="glass-btn px-6 rounded-lg font-bold text-cyan-400 hover:text-white"
+                >
+                    إرسال
+                </button>
+
+            </div>
+
         </div>
     </div>
 
-    <!-- TEAM CHAT -->
-    <div id="screen-team-chat" class="screen">
-        <div class="flex flex-col h-full max-w-4xl mx-auto w-full gap-4">
-            <div class="flex justify-between items-center flex-shrink-0">
-                <h2 class="text-xl font-bold text-purple-400">غرفة المحققين</h2>
-                <button onclick="switchScreen('screen-investigation')" class="glass-btn px-4 py-2 rounded text-sm">عودة</button>
-            </div>
-            <div class="glass rounded-xl flex-1 min-h-[300px] flex flex-col overflow-hidden p-4">
-                <div id="team-chat-log" class="flex-1 space-y-4 overflow-y-auto pr-2 mb-4"></div>
-                <div class="flex gap-2 flex-shrink-0 pt-2 border-t border-white/10">
-                    <input type="text" id="team-input" placeholder="اكتب للجروب..." class="flex-1 bg-black/40 border border-white/10 rounded px-4 py-2 text-sm text-white" onkeypress="if(event.key==='Enter') sendTeamMessage()">
-                    <button onclick="sendTeamMessage()" class="glass-btn px-6 py-2 rounded text-purple-300 font-bold text-sm">إرسال</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const navigationHistory = ['screen-home'];
-
-        function switchScreen(screenId) {
-            const currentScreen = document.querySelector('.screen.active');
-            const targetScreen = document.getElementById(screenId);
-
-            if (!targetScreen) return;
-
-            if (currentScreen) {
-                currentScreen.classList.remove('active');
-            }
-
-            targetScreen.classList.add('active');
-            targetScreen.scrollTop = 0;
-
-            if (navigationHistory[navigationHistory.length - 1] !== screenId) {
-                navigationHistory.push(screenId);
-            }
-
-            document.getElementById('global-back').style.display = (screenId !== 'screen-home') ? 'block' : 'none';
-        }
-
-        function goBack() {
-            if (navigationHistory.length > 1) {
-                navigationHistory.pop();
-                const previousScreen = navigationHistory[navigationHistory.length - 1];
-                const currentScreen = document.querySelector('.screen.active');
-                const targetScreen = document.getElementById(previousScreen);
-
-                if (currentScreen) currentScreen.classList.remove('active');
-                if (targetScreen) {
-                    targetScreen.classList.add('active');
-                    targetScreen.scrollTop = 0;
-                }
-
-                document.getElementById('global-back').style.display = (previousScreen !== 'screen-home') ? 'block' : 'none';
-            }
-        }
-
-        function beginInvestigation() { switchScreen('screen-investigation'); }
-
-        function resetSave() {
-            if (confirm('هل أنت تأكد من إعادة ضبط كافة البيانات؟')) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function searchArea(type) {
-            const list = document.getElementById('discovered-evidence-list');
-            const item = document.createElement('div');
-            item.className = 'glass p-3 rounded border-r-2 border-cyan-400 text-sm';
-            
-            let title = '', desc = '';
-            if(type === 'cameras') { title = 'الكاميرات (02:15 AM)'; desc = 'تم رصد وميض شاشة بداخل مكتب الهندسة.'; }
-            else if(type === 'location') { title = 'فحص المكتب'; desc = 'العثور على فلاشة USB خلف لوحة المفاتيح.'; }
-            else { title = 'الوثائق'; desc = 'تسجيل دخول باستخدام حساب مهندس النظام.'; }
-
-            item.innerHTML = `<strong class="text-cyan-300 block mb-1">${title}</strong><span class="text-gray-300">${desc}</span>`;
-            list.appendChild(item);
-            list.scrollTop = list.scrollHeight;
-        }
-
-        function sendInterrogationMessage() {
-            const input = document.getElementById('inter-input');
-            const log = document.getElementById('inter-chat-log');
-            if (!input.value.trim()) return;
-
-            log.innerHTML += `<div class="bg-cyan-950/40 p-3 rounded-lg border border-cyan-800/40 max-w-[80%] ml-auto dir-rtl"><span class="text-xs text-cyan-400 block mb-1">المحقق</span><p class="text-sm">${input.value}</p></div>`;
-            input.value = '';
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function sendTeamMessage() {
-            const input = document.getElementById('team-input');
-            const log = document.getElementById('team-chat-log');
-            if (!input.value.trim()) return;
-
-            log.innerHTML += `<div class="bg-purple-950/40 p-3 rounded-lg border border-purple-800/40 max-w-[80%] ml-auto dir-rtl"><span class="text-xs text-purple-400 block mb-1">أنت</span><p class="text-sm">${input.value}</p></div>`;
-            input.value = '';
-            log.scrollTop = log.scrollHeight;
-        }
-    </script>
 </body>
 </html>
