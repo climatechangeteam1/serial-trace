@@ -2,13 +2,15 @@
 <html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SERIAL TRACE — Detective Party Mystery</title>
-
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-
+    
     <style>
         :root {
             --bg-dark: #03050a;
@@ -21,60 +23,23 @@
             --text-main: #e2e8f0;
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
         body {
-            width: 100%;
-            min-width: 0;
-            min-height: 100%;
             margin: 0;
-            padding: 0;
-        }
-        body {
             background-color: var(--bg-dark);
             color: var(--text-main);
             font-family: 'Cairo', sans-serif;
-            overflow-y: auto;
-            overflow-x: hidden;
             min-height: 100vh;
-            background-image:
+            overflow-x: hidden;
+            overflow-y: auto; /* السماح بالتمرير العام للصفحة */
+            background-image: 
                 radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 80% 60%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
         }
-        button,
-        input,
-        textarea,
-        select {
-            font-family: inherit;
-        }
 
-        button {
-            -webkit-tap-highlight-color: transparent;
-        }
+        .font-en { font-family: 'Inter', sans-serif; direction: ltr; display: inline-block; }
+        .dir-ltr { direction: ltr; text-align: left; }
 
-        .font-en {
-            font-family: 'Inter', sans-serif;
-            direction: ltr;
-            display: inline-block;
-        }
-
-        .dir-ltr {
-            direction: ltr;
-            text-align: left;
-        }
-
-        .dir-rtl {
-            direction: rtl;
-            text-align: right;
-        }
-
-        /* =========================================================
-           GLASS
-           ========================================================= */
-
+        /* Glassmorphism */
         .glass {
             background: var(--panel-bg);
             backdrop-filter: blur(16px);
@@ -90,940 +55,1117 @@
             position: relative;
             overflow: hidden;
         }
-
         .glass-btn:hover:not(:disabled) {
             background: rgba(6, 182, 212, 0.2);
             border-color: var(--neon-cyan);
             box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
             transform: translateY(-2px);
         }
-
-        .glass-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
+        .glass-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        
         .glass-btn::after {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                45deg,
-                transparent,
-                rgba(255,255,255,0.05),
-                transparent
-            );
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
             transform: rotate(45deg);
             transition: 0.5s;
             opacity: 0;
-            pointer-events: none;
         }
+        .glass-btn:hover::after { opacity: 1; left: 100%; top: 100%; }
 
-        .glass-btn:hover::after {
-            opacity: 1;
-            left: 100%;
-            top: 100%;
-        }
-
-        /* =========================================================
-           SCREEN MANAGEMENT
-           ========================================================= */
-
+        /* Screen Management */
         .screen {
-            position: fixed;
-            inset: 0;
+            display: none; /* إخفاء الشاشات غير النشطة */
             width: 100%;
-            height: 100dvh;
             min-height: 100vh;
-
+            padding: 2rem;
+            box-sizing: border-box;
             opacity: 0;
-            pointer-events: none;
-
-            transition:
-                opacity 0.35s ease,
-                transform 0.35s ease;
-
-            transform: scale(0.985);
-
+            transition: opacity 0.3s ease;
+        }
+        .screen.active {
             display: flex;
             flex-direction: column;
-
-            overflow-x: hidden;
-            overflow-y: auto !important;
-
-            padding:
-                max(1rem, env(safe-area-inset-top))
-                max(1rem, env(safe-area-inset-right))
-                max(1rem, env(safe-area-inset-bottom))
-                max(1rem, env(safe-area-inset-left));
-
-            z-index: 0;
-
-            overscroll-behavior: contain;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .screen.active {
             opacity: 1;
-            pointer-events: auto;
-            transform: scale(1);
-            z-index: 10;
         }
 
-        /* Investigation and communication pages allow page scroll when tall */
-        #screen-investigation,
-        #screen-interrogation,
-        #screen-assistant,
-        #screen-team-chat,
-        #screen-evidence-board {
-            overflow-x: hidden !important;
-            overflow-y: auto !important;
+        /* Utilities */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 4px; }
+
+        .text-glow-blue { text-shadow: 0 0 10px var(--neon-blue); }
+        .text-glow-red { text-shadow: 0 0 10px var(--neon-red); }
+        
+        /* Status Bars */
+        .status-bar-bg { background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden; }
+        .status-bar-fill { height: 100%; transition: width 0.5s ease, background 0.5s ease; }
+
+        /* Evidence Board Canvas */
+        #board-container {
+            min-height: 500px;
         }
-
-        /* =========================================================
-           SCROLLBARS
-           ========================================================= */
-
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--neon-cyan) rgba(0,0,0,0.3);
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.3);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--neon-cyan);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #22d3ee;
-        }
-
-        .text-glow-blue {
-            text-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        .text-glow-red {
-            text-shadow: 0 0 10px var(--neon-red);
-        }
-
-        /* =========================================================
-           STATUS BARS
-           ========================================================= */
-
-        .status-bar-bg {
-            background: rgba(255,255,255,0.1);
-            height: 6px;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .status-bar-fill {
-            height: 100%;
-            transition:
-                width 0.5s ease,
-                background 0.5s ease;
-        }
-
-        /* =========================================================
-           EVIDENCE BOARD
-           ========================================================= */
-
         #board-canvas {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
         }
-
-        .evidence-node {
-            z-index: 2;
-            position: absolute;
-            cursor: grab;
-            max-width: 220px;
-            user-select: none;
-            word-break: break-word;
-        }
-
-        .evidence-node:active {
-            cursor: grabbing;
-        }
-
-        /* =========================================================
-           SCANLINES
-           ========================================================= */
+        .evidence-node { z-index: 2; position: absolute; cursor: grab; }
+        .evidence-node:active { cursor: grabbing; }
 
         .scanline {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background:
-                linear-gradient(
-                    to bottom,
-                    rgba(255,255,255,0),
-                    rgba(255,255,255,0) 50%,
-                    rgba(0,0,0,0.1) 50%,
-                    rgba(0,0,0,0.1)
-                );
-            background-size: 100% 4px;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0.3;
-        }
-
-        /* =========================================================
-           INTERNAL SCROLL AREAS
-           ========================================================= */
-
-        #discovered-evidence-list,
-        #inter-chat-log,
-        #ai-chat-log,
-        #team-chat-log {
-            min-height: 0;
-            overflow-y: auto;
-            overflow-x: hidden;
-            overscroll-behavior: contain;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* =========================================================
-           MOBILE / TABLET
-           ========================================================= */
-
-        @media (max-width: 768px) {
-            .screen {
-                padding:
-                    max(0.85rem, env(safe-area-inset-top))
-                    max(0.85rem, env(safe-area-inset-right))
-                    max(0.85rem, env(safe-area-inset-bottom))
-                    max(0.85rem, env(safe-area-inset-left));
-            }
-
-            #screen-home {
-                justify-content: center;
-                overflow-y: auto;
-            }
-
-            #screen-home h1 {
-                font-size: clamp(2.7rem, 13vw, 4.5rem);
-                line-height: 1;
-                word-break: break-word;
-            }
-
-            #screen-home h2 {
-                font-size: 1rem;
-                margin-bottom: 2rem;
-            }
-
-            #global-back {
-                top: max(10px, env(safe-area-inset-top));
-                right: max(10px, env(safe-area-inset-right));
-            }
-
-            #screen-investigation {
-                overflow-y: auto;
-            }
-
-            #screen-investigation .grid {
-                flex-shrink: 0;
-            }
-
-            #screen-investigation .glass.flex-1 {
-                min-height: 220px;
-                flex: none;
-            }
-
-            #screen-interrogation,
-            #screen-assistant,
-            #screen-team-chat {
-                overflow: hidden;
-            }
-
-            #screen-interrogation > div,
-            #screen-assistant > div,
-            #screen-team-chat > div {
-                min-height: 0;
-            }
-
-            #inter-chat-log,
-            #ai-chat-log,
-            #team-chat-log {
-                min-height: 0;
-                flex: 1 1 auto;
-            }
-
-            #screen-evidence-board {
-                overflow: hidden;
-            }
-
-            #board-container {
-                min-height: 0;
-            }
-
-            .evidence-node {
-                max-width: 170px;
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .screen {
-                padding:
-                    max(0.65rem, env(safe-area-inset-top))
-                    max(0.65rem, env(safe-area-inset-right))
-                    max(0.65rem, env(safe-area-inset-bottom))
-                    max(0.65rem, env(safe-area-inset-left));
-            }
-
-            #screen-map > .flex:first-child,
-            #screen-suspects > .flex:first-child {
-                flex-wrap: wrap;
-                gap: 0.75rem;
-                margin-bottom: 1.25rem;
-            }
-
-            #screen-map h2 {
-                font-size: 1.5rem;
-            }
-
-            #screen-suspects h2 {
-                font-size: 1.5rem;
-            }
-
-            #screen-briefing .glass {
-                padding: 1.1rem;
-            }
-
-            #screen-briefing h2 {
-                font-size: 1.7rem;
-                padding-top: 1rem;
-            }
-
-            #screen-briefing .flex.gap-4 {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            #screen-investigation .grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 0.6rem;
-            }
-
-            #screen-investigation .grid button {
-                padding: 0.8rem;
-                min-height: 120px;
-            }
-
-            #screen-investigation .grid button i {
-                font-size: 1.8rem;
-            }
-
-            #screen-investigation .grid button span {
-                font-size: 0.82rem;
-            }
-
-            #inter-suspect-name {
-                font-size: 1.15rem;
-            }
-
-            #screen-interrogation .grid {
-                grid-template-columns: 1fr;
-                gap: 0.5rem;
-            }
-
-            #screen-interrogation .glass.p-4 {
-                padding: 0.75rem;
-            }
-
-            #screen-interrogation .glass.p-3,
-            #screen-assistant .glass.p-3,
-            #screen-team-chat .glass.p-3 {
-                padding: 0.5rem;
-            }
-
-            #inter-input,
-            #ai-input,
-            #team-input {
-                min-width: 0;
-            }
-
-            #screen-evidence-board h2 {
-                font-size: 1.05rem;
-            }
-
-            #screen-evidence-board .text-sm {
-                display: none;
-            }
+            position: fixed; left: 0; top: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px; z-index: 9999; pointer-events: none; opacity: 0.3;
         }
     </style>
 </head>
-
 <body>
-
     <div class="scanline"></div>
+    <button id="global-back" type="button" onclick="goBack()" aria-label="رجوع" style="display:none;position:fixed;top:14px;right:14px;z-index:10000;background:rgba(10,15,29,.92);color:#e2e8f0;border:1px solid rgba(6,182,212,.35);padding:9px 14px;border-radius:12px;font-family:Cairo,sans-serif;cursor:pointer;backdrop-filter:blur(10px);">↩ رجوع</button>
 
-    <button
-        id="global-back"
-        type="button"
-        onclick="goBack()"
-        aria-label="رجوع"
-        style="
-            display:none;
-            position:fixed;
-            top:14px;
-            right:14px;
-            z-index:10000;
-            background:rgba(10,15,29,.92);
-            color:#e2e8f0;
-            border:1px solid rgba(6,182,212,.35);
-            padding:9px 14px;
-            border-radius:12px;
-            font-family:Cairo,sans-serif;
-            cursor:pointer;
-            backdrop-filter:blur(10px);
-        "
-    >
-        ↩ رجوع
-    </button>
-
-    <!-- =========================================================
-         1. HOME SCREEN
-         ========================================================= -->
-
+    
+    <!-- 1. HOME SCREEN -->
     <div id="screen-home" class="screen active justify-center items-center">
-
-        <div class="text-center max-w-2xl w-full">
-
-            <h1 class="text-7xl font-bold font-en text-glow-blue mb-2 tracking-widest uppercase">
-                Serial Trace
-            </h1>
-
-            <h2 class="text-2xl text-blue-400 mb-12 tracking-wider">
-                DETECTIVE PARTY MYSTERY
-            </h2>
-
-            <div class="space-y-4 w-64 max-w-full mx-auto">
-
-                <button
-                    onclick="switchScreen('screen-map')"
-                    class="glass-btn w-full py-4 rounded font-bold text-lg tracking-wider"
-                >
+        <div class="text-center max-w-2xl my-auto">
+            <h1 class="text-7xl font-bold font-en text-glow-blue mb-2 tracking-widest uppercase">Serial Trace</h1>
+            <h2 class="text-2xl text-blue-400 mb-12 tracking-wider">DETECTIVE PARTY MYSTERY</h2>
+            
+            <div class="space-y-4 w-64 mx-auto">
+                <button onclick="switchScreen('screen-map')" class="glass-btn w-full py-4 rounded font-bold text-lg tracking-wider">
                     <span class="font-en">START / MAP</span><br>
-                    <span class="text-sm font-normal text-blue-300">
-                        الخريطة والملفات
-                    </span>
+                    <span class="text-sm font-normal text-blue-300">الخريطة والملفات</span>
                 </button>
-
-                <button
-                    onclick="alert('Settings: Coming soon (Audio, Voice toggles)')"
-                    class="glass-btn w-full py-4 rounded font-bold text-lg tracking-wider"
-                >
+                <button onclick="alert('Settings: Coming soon (Audio, Voice toggles)')" class="glass-btn w-full py-4 rounded font-bold text-lg tracking-wider">
                     <span class="font-en">SETTINGS</span><br>
-                    <span class="text-sm font-normal text-blue-300">
-                        الإعدادات
-                    </span>
+                    <span class="text-sm font-normal text-blue-300">الإعدادات</span>
                 </button>
-
-                <button
-                    onclick="resetSave()"
-                    class="glass-btn w-full py-3 rounded text-red-400 border-red-900/50 hover:border-red-500"
-                >
+                <button onclick="resetSave()" class="glass-btn w-full py-3 rounded text-red-400 border-red-900/50 hover:border-red-500">
                     <span class="font-en text-sm">RESET DATA</span>
                 </button>
-
             </div>
         </div>
     </div>
 
-    <!-- =========================================================
-         2. MAP / CASE SELECT
-         ========================================================= -->
-
+    <!-- 2. MAP / CASE SELECT -->
     <div id="screen-map" class="screen">
-
-        <div class="flex justify-between items-center gap-4 mb-8 flex-shrink-0">
-
-            <h2 class="text-4xl font-bold font-en text-glow-blue">
-                <i class="fas fa-map-marked-alt mr-3"></i>
-                DATABASE / MAP
-            </h2>
-
-            <button
-                onclick="switchScreen('screen-home')"
-                class="glass-btn px-6 py-2 rounded flex-shrink-0"
-            >
-                <i class="fas fa-arrow-right ml-2"></i>
-                عودة
-            </button>
-
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-4xl font-bold font-en text-glow-blue"><i class="fas fa-map-marked-alt mr-3"></i> DATABASE / MAP</h2>
+            <button onclick="switchScreen('screen-home')" class="glass-btn px-6 py-2 rounded"><i class="fas fa-arrow-right ml-2"></i> عودة</button>
         </div>
-
-        <div
-            class="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6"
-            id="cases-grid"
-        >
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="cases-grid">
             <!-- Cases generated via JS -->
         </div>
-
     </div>
 
-    <!-- =========================================================
-         3. CASE BRIEFING
-         ========================================================= -->
-
-    <div id="screen-briefing" class="screen">
-
+    <!-- 3. CASE BRIEFING -->
+    <div id="screen-briefing" class="screen justify-center items-center">
         <div class="glass p-8 rounded-xl max-w-4xl mx-auto w-full relative overflow-hidden my-auto">
-
-            <div
-                class="absolute top-0 right-0 bg-blue-600/20 px-4 py-1 rounded-bl-lg border-b border-l border-blue-500/30 text-blue-300 font-en"
-                id="briefing-id"
-            >
-                CASE-001
-            </div>
-
-            <h2
-                class="text-4xl font-bold mb-2 text-cyan-400"
-                id="briefing-title"
-            >
-                العنوان
-            </h2>
-
+            <div class="absolute top-0 right-0 bg-blue-600/20 px-4 py-1 rounded-bl-lg border-b border-l border-blue-500/30 text-blue-300 font-en" id="briefing-id">CASE-001</div>
+            
+            <h2 class="text-4xl font-bold mb-2 text-cyan-400" id="briefing-title">العنوان</h2>
             <div class="flex flex-wrap gap-4 text-sm text-gray-400 mb-6 border-b border-white/10 pb-4">
-
-                <span>
-                    <i class="fas fa-map-marker-alt text-blue-400"></i>
-                    <span id="briefing-loc">المكان</span>
-                </span>
-
-                <span>
-                    <i class="fas fa-clock text-blue-400"></i>
-                    <span id="briefing-time">الوقت</span>
-                </span>
-
-                <span>
-                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
-                    Difficulty:
-                    <span id="briefing-diff" class="font-en">HARD</span>
-                </span>
-
+                <span><i class="fas fa-map-marker-alt text-blue-400"></i> <span id="briefing-loc">المكان</span></span>
+                <span><i class="fas fa-clock text-blue-400"></i> <span id="briefing-time">الوقت</span></span>
+                <span><i class="fas fa-exclamation-triangle text-yellow-400"></i> Difficulty: <span id="briefing-diff" class="font-en">HARD</span></span>
             </div>
-
+            
             <div class="space-y-6 text-lg leading-relaxed mb-8">
-
                 <div>
-                    <h3 class="text-blue-400 font-bold mb-2">
-                        <i class="fas fa-book-open"></i>
-                        ملخص القضية (Story)
-                    </h3>
-
-                    <p id="briefing-story" class="text-gray-200">
-                        القصة...
-                    </p>
+                    <h3 class="text-blue-400 font-bold mb-2"><i class="fas fa-book-open"></i> ملخص القضية (Story)</h3>
+                    <p id="briefing-story" class="text-gray-200">القصة...</p>
                 </div>
-
                 <div>
-                    <h3 class="text-red-400 font-bold mb-2">
-                        <i class="fas fa-bolt"></i>
-                        البلاغ الأولي (Incident)
-                    </h3>
-
-                    <p id="briefing-incident" class="text-gray-200">
-                        البلاغ...
-                    </p>
+                    <h3 class="text-red-400 font-bold mb-2"><i class="fas fa-bolt"></i> البلاغ الأولي (Incident)</h3>
+                    <p id="briefing-incident" class="text-gray-200">البلاغ...</p>
                 </div>
-
             </div>
-
+            
             <div class="text-center">
-
-                <button
-                    onclick="beginInvestigation()"
-                    class="glass-btn px-12 py-4 rounded-lg font-bold text-xl text-cyan-300 hover:text-white transition shadow-[0_0_15px_rgba(6,182,212,0.3)]"
-                >
-                    بدء التحقيق
-                    <i class="fas fa-play mr-2"></i>
+                <button onclick="beginInvestigation()" class="glass-btn px-12 py-4 rounded-lg font-bold text-xl text-cyan-300 hover:text-white transition shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                    بدء التحقيق <i class="fas fa-play mr-2"></i>
                 </button>
-
             </div>
-
         </div>
     </div>
 
-    <!-- =========================================================
-         4. INVESTIGATION HUB
-         ========================================================= -->
-
+    <!-- 4. INVESTIGATION HUB -->
     <div id="screen-investigation" class="screen">
-
-        <div class="flex justify-between items-center gap-4 mb-6 flex-shrink-0">
-
-            <div class="min-w-0">
-
-                <h2
-                    class="text-3xl font-bold text-cyan-400 mb-1 truncate"
-                    id="hub-case-title"
-                >
-                    القضية
-                </h2>
-
-                <div class="text-red-400 font-en text-xl font-bold tracking-widest">
-                    <i class="fas fa-stopwatch"></i>
-                    <span id="case-timer">45:00</span>
-                </div>
-
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-3xl font-bold text-cyan-400 mb-1" id="hub-case-title">القضية</h2>
+                <div class="text-red-400 font-en text-xl font-bold tracking-widest"><i class="fas fa-stopwatch"></i> <span id="case-timer">45:00</span></div>
             </div>
-
-            <div class="flex gap-3 flex-shrink-0">
-
-                <button
-                    onclick="switchScreen('screen-team-chat')"
-                    class="glass-btn px-4 py-2 rounded text-purple-300"
-                >
-                    <i class="fas fa-comments ml-2"></i>
-                    نقاش الفريق
-                </button>
-
-                <button
-                    onclick="switchScreen('screen-map')"
-                    class="glass-btn px-4 py-2 rounded text-gray-400"
-                >
-                    <i class="fas fa-times"></i>
-                </button>
-
+            <div class="flex gap-3">
+                <button onclick="switchScreen('screen-team-chat')" class="glass-btn px-4 py-2 rounded text-purple-300"><i class="fas fa-comments ml-2"></i> نقاش الفريق</button>
+                <button onclick="switchScreen('screen-map')" class="glass-btn px-4 py-2 rounded text-gray-400"><i class="fas fa-times"></i></button>
             </div>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 flex-shrink-0">
-
-            <button
-                onclick="searchArea('cameras')"
-                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
-            >
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <button onclick="searchArea('cameras')" class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3">
                 <i class="fas fa-video text-4xl text-blue-400"></i>
                 <span class="font-bold text-lg">مراجعة الكاميرات</span>
                 <span class="text-xs font-en text-gray-400">CAMERAS</span>
             </button>
-
-            <button
-                onclick="searchArea('location')"
-                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
-            >
+            <button onclick="searchArea('location')" class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3">
                 <i class="fas fa-search-location text-4xl text-blue-400"></i>
                 <span class="font-bold text-lg">فحص الموقع</span>
                 <span class="text-xs font-en text-gray-400">LOCATION</span>
             </button>
-
-            <button
-                onclick="searchArea('documents')"
-                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
-            >
+            <button onclick="searchArea('documents')" class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3">
                 <i class="fas fa-file-alt text-4xl text-blue-400"></i>
                 <span class="font-bold text-lg">مراجعة الوثائق</span>
                 <span class="text-xs font-en text-gray-400">DOCUMENTS</span>
             </button>
-
-            <button
-                onclick="switchScreen('screen-suspects')"
-                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-cyan-500/50"
-            >
+            <button onclick="switchScreen('screen-suspects')" class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-cyan-500/50">
                 <i class="fas fa-user-secret text-4xl text-cyan-400"></i>
                 <span class="font-bold text-lg">المشتبه بهم والاستجواب</span>
                 <span class="text-xs font-en text-gray-400">SUSPECTS</span>
             </button>
-
-            <button
-                onclick="switchScreen('screen-evidence-board')"
-                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-purple-500/50"
-            >
+            
+            <button onclick="switchScreen('screen-evidence-board')" class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-purple-500/50">
                 <i class="fas fa-project-diagram text-4xl text-purple-400"></i>
                 <span class="font-bold text-lg">لوحة الأدلة والربط</span>
                 <span class="text-xs font-en text-gray-400">EVIDENCE BOARD</span>
             </button>
-
-            <button
-                onclick="switchScreen('screen-assistant')"
-                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
-            >
+            <button onclick="switchScreen('screen-assistant')" class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3">
                 <i class="fas fa-robot text-4xl text-blue-400"></i>
                 <span class="font-bold text-lg">المساعد الذكي</span>
                 <span class="text-xs font-en text-gray-400">AI ASSISTANT</span>
             </button>
-
-            <button
-                onclick="searchArea('timeline')"
-                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3"
-            >
+            <button onclick="searchArea('timeline')" class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3">
                 <i class="fas fa-history text-4xl text-blue-400"></i>
                 <span class="font-bold text-lg">تحليل التايم لاين</span>
                 <span class="text-xs font-en text-gray-400">TIMELINE</span>
             </button>
-
-            <button
-                onclick="switchScreen('screen-accusation')"
-                class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-red-500/50 bg-red-900/10"
-            >
+            <button onclick="switchScreen('screen-accusation')" class="glass glass-btn p-6 rounded-xl flex flex-col items-center gap-3 border-red-500/50 bg-red-900/10">
                 <i class="fas fa-gavel text-4xl text-red-400"></i>
                 <span class="font-bold text-lg">توجيه الاتهام النهائي</span>
                 <span class="text-xs font-en text-gray-400">FINAL ACCUSATION</span>
             </button>
-
         </div>
-
-        <div class="glass p-6 rounded-xl flex-1 min-h-0 overflow-hidden flex flex-col">
-
-            <h3 class="text-xl font-bold mb-4 text-cyan-300 flex-shrink-0">
-                <i class="fas fa-folder-open ml-2"></i>
-                الأدلة المكتشفة
-            </h3>
-
-            <div
-                id="discovered-evidence-list"
-                class="overflow-y-auto overflow-x-hidden space-y-3 pr-2 flex-1 min-h-0"
-            >
+        
+        <!-- Discovered Evidence Quick View -->
+        <div class="glass p-6 rounded-xl min-h-[250px] flex flex-col">
+            <h3 class="text-xl font-bold mb-4 text-cyan-300"><i class="fas fa-folder-open ml-2"></i> الأدلة المكتشفة</h3>
+            <div id="discovered-evidence-list" class="space-y-3 max-h-60 overflow-y-auto pr-2">
                 <!-- Populated via JS -->
             </div>
-
         </div>
     </div>
 
-    <!-- =========================================================
-         5. EVIDENCE BOARD
-         ========================================================= -->
-
+    <!-- 5. EVIDENCE BOARD -->
     <div id="screen-evidence-board" class="screen bg-[#020305]">
-
-        <div class="flex justify-between items-center gap-4 mb-4 z-10 flex-shrink-0">
-
-            <h2 class="text-2xl font-bold text-purple-400">
-                <i class="fas fa-project-diagram ml-2"></i>
-                لوحة الربط (Evidence Board)
-            </h2>
-
-            <div class="text-sm text-gray-400 text-center">
-                انقر على عنصرين لربطهما
-                <span class="font-en">
-                    (Click two items to connect)
-                </span>
-            </div>
-
-            <button
-                onclick="switchScreen('screen-investigation')"
-                class="glass-btn px-4 py-2 rounded flex-shrink-0"
-            >
-                عودة
-                <i class="fas fa-arrow-left mr-2"></i>
-            </button>
-
+        <div class="flex justify-between items-center mb-4 z-10">
+            <h2 class="text-2xl font-bold text-purple-400"><i class="fas fa-project-diagram ml-2"></i> لوحة الربط (Evidence Board)</h2>
+            <div class="text-sm text-gray-400">انقر على عنصرين لربطهما (Click two items to connect)</div>
+            <button onclick="switchScreen('screen-investigation')" class="glass-btn px-4 py-2 rounded">عودة <i class="fas fa-arrow-left mr-2"></i></button>
         </div>
-
-        <div
-            id="board-container"
-            class="relative flex-1 min-h-0 glass rounded-xl overflow-hidden border-purple-900/30"
-        >
-
+        <div id="board-container" class="relative flex-1 min-h-[500px] glass rounded-xl overflow-hidden border-purple-900/30">
             <canvas id="board-canvas"></canvas>
-
-            <div
-                id="board-nodes"
-                class="absolute inset-0 overflow-hidden"
-            >
+            <div id="board-nodes" class="absolute w-full h-full p-4">
                 <!-- Nodes populated here -->
             </div>
-
         </div>
     </div>
 
-    <!-- =========================================================
-         6. SUSPECTS LIST
-         ========================================================= -->
-
+    <!-- 6. SUSPECTS LIST -->
     <div id="screen-suspects" class="screen">
-
-        <div class="flex justify-between items-center gap-4 mb-8 flex-shrink-0">
-
-            <h2 class="text-3xl font-bold text-cyan-400">
-                <i class="fas fa-users ml-2"></i>
-                المشتبه بهم
-            </h2>
-
-            <button
-                onclick="switchScreen('screen-investigation')"
-                class="glass-btn px-4 py-2 rounded flex-shrink-0"
-            >
-                عودة
-                <i class="fas fa-arrow-left mr-2"></i>
-            </button>
-
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-cyan-400"><i class="fas fa-users ml-2"></i> المشتبه بهم</h2>
+            <button onclick="switchScreen('screen-investigation')" class="glass-btn px-4 py-2 rounded">عودة <i class="fas fa-arrow-left mr-2"></i></button>
         </div>
-
-        <div
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6"
-            id="suspects-grid"
-        >
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="suspects-grid">
             <!-- Populated via JS -->
         </div>
-
     </div>
 
-    <!-- =========================================================
-         7. INTERROGATION SCREEN
-         ========================================================= -->
-
+    <!-- 7. INTERROGATION SCREEN -->
     <div id="screen-interrogation" class="screen">
-
-        <div class="flex flex-col min-h-0 h-full max-w-5xl mx-auto w-full gap-4">
-
-            <div class="flex justify-between items-center flex-shrink-0">
-
-                <button
-                    onclick="switchScreen('screen-suspects')"
-                    class="glass-btn px-4 py-2 rounded text-sm"
-                >
-                    <i class="fas fa-arrow-right ml-2"></i>
-                    المشتبه بهم
-                </button>
-
-                <div
-                    class="font-en text-red-400 font-bold"
-                    id="interrogation-timer"
-                >
-                    45:00
-                </div>
-
+        <div class="flex flex-col h-full max-w-5xl mx-auto w-full gap-4">
+            <div class="flex justify-between items-center">
+                <button onclick="switchScreen('screen-suspects')" class="glass-btn px-4 py-2 rounded text-sm"><i class="fas fa-arrow-right ml-2"></i> المشتبه بهم</button>
+                <div class="font-en text-red-400 font-bold" id="interrogation-timer">45:00</div>
             </div>
 
             <!-- Suspect Header -->
-
-            <div class="glass p-4 rounded-xl flex items-center gap-6 border-l-4 border-cyan-500 flex-shrink-0">
-
-                <div class="w-20 h-20 rounded-full bg-gray-800 border-2 border-cyan-500 flex items-center justify-center text-3xl flex-shrink-0">
+            <div class="glass p-4 rounded-xl flex items-center gap-6 border-l-4 border-cyan-500">
+                <div class="w-20 h-20 rounded-full bg-gray-800 border-2 border-cyan-500 flex items-center justify-center text-3xl shrink-0">
                     <i class="fas fa-user text-gray-400"></i>
                 </div>
-
-                <div class="flex-1 min-w-0">
-
-                    <h2
-                        class="text-2xl font-bold text-white mb-1 truncate"
-                        id="inter-suspect-name"
-                    >
-                        الاسم
-                    </h2>
-
-                    <p
-                        class="text-sm text-gray-400 mb-2 truncate"
-                        id="inter-suspect-job"
-                    >
-                        الوظيفة
-                    </p>
-
-                    <div class="grid grid-cols-3 gap-4 text-sm font-en">
-
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-white mb-1" id="inter-suspect-name">الاسم</h2>
+                    <p class="text-sm text-gray-400 mb-2" id="inter-suspect-job">الوظيفة</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-en">
                         <div>
-                            <div class="flex justify-between mb-1">
-                                <span>Stress</span>
-                                <span id="inter-stress-val">0%</span>
-                            </div>
-
-                            <div class="status-bar-bg">
-                                <div
-                                    id="inter-stress-bar"
-                                    class="status-bar-fill bg-green-500"
-                                    style="width:0%"
-                                ></div>
-                            </div>
+                            <div class="flex justify-between mb-1"><span>Stress</span> <span id="inter-stress-val">0%</span></div>
+                            <div class="status-bar-bg"><div id="inter-stress-bar" class="status-bar-fill bg-green-500" style="width:0%"></div></div>
                         </div>
-
                         <div>
-                            <div class="flex justify-between mb-1">
-                                <span>Cooperation</span>
-                                <span id="inter-coop-val">100%</span>
-                            </div>
-
-                            <div class="status-bar-bg">
-                                <div
-                                    id="inter-coop-bar"
-                                    class="status-bar-fill bg-blue-500"
-                                    style="width:100%"
-                                ></div>
-                            </div>
+                            <div class="flex justify-between mb-1"><span>Cooperation</span> <span id="inter-coop-val">100%</span></div>
+                            <div class="status-bar-bg"><div id="inter-coop-bar" class="status-bar-fill bg-blue-500" style="width:100%"></div></div>
                         </div>
-
                         <div>
-                            <div class="flex justify-between mb-1">
-                                <span>Status</span>
-                            </div>
-
-                            <div
-                                id="inter-status-text"
-                                class="font-bold text-green-400"
-                            >
-                                CALM
-                            </div>
+                            <div class="flex justify-between mb-1"><span>Status</span></div>
+                            <div id="inter-status-text" class="font-bold text-green-400">CALM</div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
             <!-- Chat Area -->
-
-            <div
-                class="glass flex-1 min-h-0 rounded-xl p-4 overflow-y-auto overflow-x-hidden flex flex-col gap-4 dir-ltr"
-                id="inter-chat-log"
-            >
-                <div class="text-center text-gray-500 text-sm mb-4 flex-shrink-0">
-                    -- Session Started --
-                </div>
+            <div class="glass min-h-[350px] max-h-[500px] rounded-xl p-4 overflow-y-auto flex flex-col gap-4 dir-ltr" id="inter-chat-log">
+                <div class="text-center text-gray-500 text-sm mb-4">-- Session Started --</div>
+                <!-- Messages go here -->
             </div>
 
             <!-- Input Area -->
-
-            <div class="glass p-3 rounded-xl flex gap-3 dir-ltr flex-shrink-0">
-
-                <button
-                    onclick="toggleVoice()"
-                    id="btn-voice"
-                    class="glass-btn w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center text-gray-400 hover:text-cyan-400"
-                    title="Toggle Voice (TTS)"
-                >
+            <div class="glass p-3 rounded-xl flex gap-3 dir-ltr">
+                <button onclick="toggleVoice()" id="btn-voice" class="glass-btn w-12 rounded-lg flex items-center justify-center text-gray-400 hover:text-cyan-400 shrink-0" title="Toggle Voice (TTS)">
                     <i class="fas fa-volume-up"></i>
                 </button>
-
-                <input
-                    type="text"
-                    id="inter-input"
-                    class="flex-1 min-w-0 bg-black/50 border border-white/10 rounded-lg px-4 text-white focus:outline-none focus:border-cyan-500 text-right dir-rtl"
-                    placeholder="اطرح سؤالاً..."
-                    onkeydown="if(event.key === 'Enter') sendInterrogationMessage()"
-                >
-
-                <button
-                    onclick="sendInterrogationMessage()"
-                    class="glass-btn px-6 rounded-lg font-bold text-cyan-400 hover:text-white"
-                >
-                    إرسال
-                </button>
-
+                <input type="text" id="inter-input" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 text-white focus:outline-none focus:border-cyan-500 text-right dir-rtl" placeholder="اطرح سؤالاً... (اسأل عن الأدلة أو الوقت)">
+                <button onclick="sendInterrogation()" class="glass-btn px-6 rounded-lg text-cyan-400 font-bold shrink-0"><i class="fas fa-paper-plane"></i></button>
             </div>
-
         </div>
     </div>
 
+    <!-- 8. ASSISTANT -->
+    <div id="screen-assistant" class="screen">
+         <div class="flex flex-col h-full max-w-4xl mx-auto w-full gap-4">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-2xl font-bold text-blue-400"><i class="fas fa-robot ml-2"></i> المساعد الذكي (AI Assistant)</h2>
+                <button onclick="switchScreen('screen-investigation')" class="glass-btn px-4 py-2 rounded">عودة <i class="fas fa-arrow-left mr-2"></i></button>
+            </div>
+            
+            <div class="glass min-h-[350px] max-h-[500px] rounded-xl p-4 overflow-y-auto flex flex-col gap-4" id="ai-chat-log">
+                <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg p-4 max-w-[80%] self-start">
+                    <p class="text-blue-100">أهلاً أيها المحقق. أنا مساعدك في تحليل القضية. بناءً على الأدلة التي وجدناها حتى الآن، كيف يمكنني مساعدتك؟ (اسألني لتلخيص التناقضات أو ربط الأدلة)</p>
+                </div>
+            </div>
+
+            <div class="glass p-3 rounded-xl flex gap-3">
+                <input type="text" id="ai-input" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 text-white focus:outline-none focus:border-blue-500" placeholder="اطلب مساعدة في التحليل...">
+                <button onclick="sendAssistant()" class="glass-btn px-6 rounded-lg text-blue-400 font-bold shrink-0"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. TEAM DISCUSSION -->
+    <div id="screen-team-chat" class="screen">
+        <div class="flex flex-col h-full max-w-4xl mx-auto w-full gap-4">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-2xl font-bold text-purple-400"><i class="fas fa-comments ml-2"></i> نقاش الفريق (Local Team Chat)</h2>
+                <button onclick="switchScreen('screen-investigation')" class="glass-btn px-4 py-2 rounded">عودة <i class="fas fa-arrow-left mr-2"></i></button>
+            </div>
+            
+            <div class="glass p-3 flex gap-4 items-center rounded-xl">
+                <span>المحقق الحالي:</span>
+                <select id="team-player-select" class="bg-black/50 border border-white/20 rounded p-2 text-white outline-none">
+                    <option value="Player 1">المحقق 1</option>
+                    <option value="Player 2">المحقق 2</option>
+                    <option value="Player 3">المحقق 3</option>
+                    <option value="Player 4">المحقق 4</option>
+                </select>
+            </div>
+
+            <div class="glass min-h-[350px] max-h-[500px] rounded-xl p-4 overflow-y-auto flex flex-col gap-4" id="team-chat-log">
+                <!-- Team messages -->
+            </div>
+
+            <div class="glass p-3 rounded-xl flex gap-3">
+                <input type="text" id="team-input" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-4 text-white focus:outline-none focus:border-purple-500" placeholder="اكتب ملاحظة للفريق...">
+                <button onclick="sendTeamMessage()" class="glass-btn px-6 rounded-lg text-purple-400 font-bold shrink-0"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. FINAL ACCUSATION -->
+    <div id="screen-accusation" class="screen justify-center items-center">
+        <div class="glass p-8 rounded-xl max-w-2xl w-full border border-red-500/50 relative overflow-hidden my-auto">
+            <div class="absolute top-0 left-0 w-full h-1 bg-red-600 animate-pulse"></div>
+            
+            <h2 class="text-3xl font-bold text-red-400 mb-6 text-center"><i class="fas fa-gavel mr-2"></i> توجيه الاتهام النهائي</h2>
+            <p class="text-gray-300 mb-6 text-center">بمجرد تأكيد الاتهام، سيتم إغلاق التحقيق وتقييم النتيجة. تأكد من أدلتك.</p>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">المشتبه به (Suspect):</label>
+                    <select id="accuse-suspect" class="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white outline-none focus:border-red-500">
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">الدليل الرئيسي (Primary Evidence):</label>
+                    <select id="accuse-evidence" class="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white outline-none focus:border-red-500">
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">الدافع / السبب (Motive):</label>
+                    <textarea id="accuse-reason" rows="3" class="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white outline-none focus:border-red-500" placeholder="اكتب سبب الاتهام بناءً على تحقيقاتك..."></textarea>
+                </div>
+            </div>
+            
+            <div class="mt-8 flex gap-4">
+                <button onclick="switchScreen('screen-investigation')" class="glass-btn flex-1 py-3 rounded-lg text-gray-300">إلغاء ومتابعة التحقيق</button>
+                <button onclick="submitAccusation()" class="glass-btn flex-1 py-3 rounded-lg text-white bg-red-600/20 border-red-500 hover:bg-red-600/40 font-bold">تأكيد الاتهام <i class="fas fa-lock mr-2"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 11. RESULT SCREEN -->
+    <div id="screen-result" class="screen justify-center items-center bg-[#050505]">
+        <div class="glass p-10 rounded-xl max-w-2xl w-full text-center relative overflow-hidden my-auto" id="result-card">
+            <!-- Populated via JS -->
+        </div>
+    </div>
+
+    <!-- Interactive Investigation Modal -->
+    <div id="modal-scan" class="fixed top-0 left-0 w-full h-full bg-black/90 z-[60] hidden justify-center items-center p-4 backdrop-blur-md overflow-y-auto">
+        <div class="glass p-7 rounded-xl max-w-2xl w-full border border-cyan-500/30 my-auto">
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <div class="text-xs text-cyan-400 font-en tracking-widest">INVESTIGATION</div>
+                    <h2 id="scan-title" class="text-2xl font-bold text-white">اختر ما تريد فحصه</h2>
+                </div>
+                <button onclick="closeModal('modal-scan')" class="glass-btn px-3 py-2 rounded">×</button>
+            </div>
+            <p id="scan-log" class="text-gray-400 mb-5">لا يوجد زر يعطيكم الحل. اختاروا نقطة للتحقيق وافحصوها بأنفسكم.</p>
+            <div id="investigation-choices" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </div>
+    </div>
+
+    <!-- Evidence Found Modal -->
+    <div id="modal-found" class="fixed top-0 left-0 w-full h-full bg-black/80 z-[70] hidden justify-center items-center p-4 backdrop-blur-sm overflow-y-auto">
+        <div class="glass p-8 rounded-xl max-w-md w-full text-center border border-green-500/50 shadow-[0_0_30px_rgba(34,197,94,0.2)] transform transition-transform my-auto" id="modal-found-content">
+            <div class="w-24 h-24 bg-green-900/40 rounded-full flex justify-center items-center mx-auto mb-6 border border-green-500">
+                <i class="fas fa-search-plus text-5xl text-green-400 animate-bounce"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-3 text-white">تم العثور على أثر جديد!</h3>
+            <p class="text-green-300 font-bold text-xl mb-3" id="found-ev-title">أثر غير محلل</p>
+            <p class="text-gray-400 mb-8">النتيجة ليست تفسيرًا جاهزًا. افتح ملف القضية، اقرأ الوقائع، وقارنها بباقي الأدلة لتستنتج معناها.</p>
+            <button onclick="closeModal('modal-found')" class="glass-btn px-8 py-3 rounded text-white bg-green-600/20 border-green-500 hover:bg-green-600/40 font-bold w-full">إضافة لملف القضية <i class="fas fa-folder-plus ml-2"></i></button>
+        </div>
+    </div>
+
+    <!-- Info/Error Modal -->
+    <div id="modal-info" class="fixed top-0 left-0 w-full h-full bg-black/80 z-[70] hidden justify-center items-center p-4 backdrop-blur-sm overflow-y-auto">
+        <div class="glass p-8 rounded-xl max-w-md w-full text-center border border-yellow-500/50 shadow-[0_0_30px_rgba(234,179,8,0.2)] my-auto">
+            <i class="fas fa-exclamation-triangle text-5xl text-yellow-400 mb-6"></i>
+            <h3 class="text-xl font-bold mb-8 text-white" id="info-msg-text">رسالة</h3>
+            <button onclick="closeModal('modal-info')" class="glass-btn px-8 py-2 rounded text-white bg-yellow-600/20 border-yellow-500 w-full">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-evidence" class="fixed top-0 left-0 w-full h-full bg-black/80 z-50 hidden justify-center items-center p-4 overflow-y-auto">
+        <div class="glass max-w-lg w-full p-6 rounded-xl relative transform scale-95 transition-transform my-auto" id="modal-evidence-content">
+            <button onclick="closeModal('modal-evidence')" class="absolute top-4 left-4 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            <div class="text-blue-400 font-en text-sm mb-2" id="mod-ev-type">TYPE</div>
+            <h3 class="text-2xl font-bold mb-4 text-white" id="mod-ev-title">Title</h3>
+            <p class="text-gray-300 mb-4 leading-relaxed" id="mod-ev-desc">Description</p>
+            <div class="bg-black/40 p-3 rounded text-sm text-gray-400 font-en">
+                <div>Loc: <span id="mod-ev-loc"></span></div>
+                <div>Time: <span id="mod-ev-time"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================
+           DATA TIER: LOADED FROM SECURE BACKEND
+           ========================================================= */
+        let CASES = [];
+
+        /* =========================================================
+           STATE MANAGEMENT
+           ========================================================= */
+        let state = {
+            unlocked: [],
+            solved: [],
+            currentCase: null,
+            timer: 0,
+            timerInterval: null,
+            discoveredEvidence: [],
+            teamChat: [],
+            connections: [],
+            searchedActions: {}
+        };
+
+        async function init() {
+            try {
+                const response = await fetch('/api/cases');
+                const data = await response.json();
+                if (!data.success || !Array.isArray(data.cases) || !data.cases.length) throw new Error('تعذر تحميل القضايا');
+                CASES = data.cases;
+            } catch (error) {
+                console.error(error);
+                alert('تعذر الاتصال بـ Backend. شغّل server.js أولاً ثم أعد تحميل اللعبة.');
+                return;
+            }
+            loadSave();
+            if (!Array.isArray(state.unlocked) || state.unlocked.length === 0) state.unlocked = [CASES[0]?.id].filter(Boolean);
+            state.unlocked = state.unlocked.filter(id => CASES.some(c => c.id === id));
+            if (!state.unlocked.includes(CASES[0]?.id)) state.unlocked.unshift(CASES[0].id);
+            renderCases();
+            switchScreen('screen-home', false);
+        }
+
+        const SCREEN_HISTORY = [];
+        let currentScreenId = 'screen-home';
+
+        function switchScreen(screenId, addHistory = true) {
+            const target = document.getElementById(screenId);
+            if (!target) {
+                console.error('Screen not found:', screenId);
+                return;
+            }
+
+            if (addHistory && currentScreenId !== screenId) {
+                SCREEN_HISTORY.push(currentScreenId);
+            }
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            target.classList.add('active');
+            currentScreenId = screenId;
+
+            // العودة لأعلى الصفحة عند التنقل بين الشاشات
+            window.scrollTo(0, 0);
+
+            const back = document.getElementById('global-back');
+            if (back) back.style.display = screenId === 'screen-home' ? 'none' : 'block';
+
+            if(screenId === 'screen-evidence-board' && typeof initBoard === 'function') initBoard();
+            if(screenId === 'screen-team-chat' && typeof renderTeamChat === 'function') renderTeamChat();
+        }
+
+        function goBack() {
+            if (SCREEN_HISTORY.length) {
+                const previous = SCREEN_HISTORY.pop();
+                switchScreen(previous, false);
+                return;
+            }
+            switchScreen('screen-home', false);
+        }
+
+        /* =========================================================
+           CASES & MAP
+           ========================================================= */
+        function renderCases() {
+            const grid = document.getElementById('cases-grid');
+            grid.innerHTML = '';
+            
+            CASES.forEach(c => {
+                const isUnlocked = state.unlocked.includes(c.id);
+                const isSolved = state.solved.includes(c.id);
+                
+                let statusClass = "border-gray-800 opacity-50";
+                let statusIcon = '<i class="fas fa-lock"></i> مقفل';
+                let btnAction = `alert('قم بحل القضايا السابقة لفتح هذه القضية.')`;
+                
+                if (isSolved) {
+                    statusClass = "border-green-500/50 bg-green-900/10 opacity-80";
+                    statusIcon = '<i class="fas fa-check-circle text-green-400"></i> محلولة';
+                    btnAction = `openCase('${c.id}')`;
+                } else if (isUnlocked) {
+                    statusClass = "border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.2)]";
+                    statusIcon = '<i class="fas fa-unlock text-blue-400"></i> متاحة';
+                    btnAction = `openCase('${c.id}')`;
+                }
+
+                grid.innerHTML += `
+                    <div class="glass p-5 rounded-xl border ${statusClass} flex flex-col justify-between hover:bg-white/5 transition">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="font-en text-sm text-gray-400">${c.id}</span>
+                                <span class="text-xs font-bold px-2 py-1 bg-black/50 rounded text-gray-300">${statusIcon}</span>
+                            </div>
+                            <h3 class="text-xl font-bold mb-1 text-white">${c.title}</h3>
+                            <p class="text-sm text-blue-300 mb-4"><i class="fas fa-map-marker-alt"></i> ${c.city} - ${c.location}</p>
+                        </div>
+                        <button onclick="${btnAction}" class="glass-btn w-full py-2 rounded text-sm font-bold">عرض الملف</button>
+                    </div>
+                `;
+            });
+        }
+
+        function openCase(id) {
+            const c = CASES.find(x => x.id === id);
+            if (!c) {
+                alert('القضية غير موجودة.');
+                return;
+            }
+            state.currentCase = JSON.parse(JSON.stringify(c)); // deep copy
+            state.discoveredEvidence = [];
+            state.connections = [];
+            state.searchedActions = {};
+            
+            document.getElementById('briefing-id').innerText = c.id;
+            document.getElementById('briefing-title').innerText = c.title;
+            document.getElementById('briefing-loc').innerText = c.city + " - " + c.location;
+            document.getElementById('briefing-time').innerText = "الوقت المتاح: " + Math.floor(c.timeLimit/60) + " دقيقة";
+            document.getElementById('briefing-diff').innerText = c.difficulty;
+            document.getElementById('briefing-story').innerText = c.story;
+            document.getElementById('briefing-incident').innerText = c.incident;
+            
+            switchScreen('screen-briefing');
+        }
+
+        function beginInvestigation() {
+            state.timer = state.currentCase.timeLimit;
+            document.getElementById('hub-case-title').innerText = state.currentCase.title;
+            
+            clearInterval(state.timerInterval);
+            state.timerInterval = setInterval(updateTimer, 1000);
+            
+            renderDiscoveredEvidence();
+            populateAccusationForm();
+            switchScreen('screen-investigation');
+        }
+
+        function updateTimer() {
+            if(state.timer <= 0) {
+                clearInterval(state.timerInterval);
+                const infoText = document.getElementById('info-msg-text');
+                const infoModal = document.getElementById('modal-info');
+                if (infoText) infoText.innerText = "انتهى الوقت المتاح للتحقيق! المجرم تمكن من طمس الأدلة وهرب.";
+                if (infoModal) {
+                    infoModal.classList.remove('hidden');
+                    infoModal.classList.add('flex');
+                }
+                switchScreen('screen-map');
+                return;
+            }
+            state.timer--;
+            const m = Math.floor(state.timer / 60).toString().padStart(2, '0');
+            const s = (state.timer % 60).toString().padStart(2, '0');
+            const display = `${m}:${s}`;
+            document.getElementById('case-timer').innerText = display;
+            document.getElementById('interrogation-timer').innerText = display;
+        }
+
+        const INVESTIGATION_SPOTS = {
+            cameras: [
+                {label:'🎥 تكبير اللقطة عند المدخل', types:['Camera Footage'], icon:'fa-video'},
+                {label:'🕐 فحص توقيت التسجيل', types:['Camera Footage','Timeline'], icon:'fa-clock'},
+                {label:'🚪 مراجعة الكاميرا الخلفية', types:['Camera Footage','Photo'], icon:'fa-door-open'},
+                {label:'🖥️ مراجعة غرفة التحكم', types:['Access Log','Document'], icon:'fa-desktop'},
+                {label:'🔍 فحص لقطة لا يظهر فيها شيء واضح', types:[], icon:'fa-eye'}
+            ],
+            location: [
+                {label:'🧤 فحص الأرضية والمقبض', types:['Physical'], icon:'fa-hand-sparkles'},
+                {label:'🗑️ تفتيش سلة المهملات', types:['Receipt','Physical'], icon:'fa-trash'},
+                {label:'👤 البحث عن شاهد قريب', types:['Witness Statement'], icon:'fa-user'},
+                {label:'🚗 فحص المنطقة الخارجية', types:['Vehicle','Witness Statement'], icon:'fa-car'},
+                {label:'🔍 تفتيش مكان عشوائي', types:[], icon:'fa-search'}
+            ],
+            documents: [
+                {label:'💻 فحص سجل الدخول', types:['Access Log'], icon:'fa-server'},
+                {label:'📱 مراجعة الرسائل والسجلات', types:['Phone Record','Email'], icon:'fa-mobile-alt'},
+                {label:'📄 فحص الملفات الورقية', types:['Document'], icon:'fa-file-alt'},
+                {label:'🧾 البحث عن إيصالات أو مستندات صغيرة', types:['Receipt'], icon:'fa-receipt'},
+                {label:'🔍 فحص ملف غير مهم', types:[], icon:'fa-folder-open'}
+            ],
+            timeline: [
+                {label:'🕐 مطابقة أوقات الدخول والخروج', types:['Timeline','Access Log'], icon:'fa-clock'},
+                {label:'📞 مطابقة سجل الاتصالات مع الوقت', types:['Phone Record'], icon:'fa-phone'},
+                {label:'📷 مقارنة وقت الكاميرا', types:['Camera Footage','Photo'], icon:'fa-video'},
+                {label:'👤 مقارنة أقوال المشتبهين بالتوقيت', types:['Witness Statement'], icon:'fa-user-clock'},
+                {label:'🔍 مراجعة وقت لا يرتبط بأي دليل', types:[], icon:'fa-question'}
+            ]
+        };
+
+        function searchArea(areaType) {
+            const modal = document.getElementById('modal-scan');
+            const title = document.getElementById('scan-title');
+            const log = document.getElementById('scan-log');
+            const choices = document.getElementById('investigation-choices');
+            const spots = INVESTIGATION_SPOTS[areaType] || INVESTIGATION_SPOTS.location;
+            const names = {cameras:'مسرح الكاميرات',location:'مسرح الجريمة',documents:'الوثائق والسجلات',timeline:'تحليل الخط الزمني'};
+            title.textContent = names[areaType] || 'تحقيق';
+            log.textContent = 'اختاروا أين تبحثون. لا توجد نتيجة صحيحة معروضة مسبقًا؛ عليك اكتشافها من القرائن.';
+            choices.innerHTML = spots.map((spot,i)=>{
+                const key=areaType+'-'+i;
+                const used=!!state.searchedActions[key];
+                return `<button ${used?'disabled':''} onclick="investigateSpot('${areaType}',${i})" class="glass-btn text-right p-4 rounded-xl ${used?'opacity-40':''}">
+                    <i class="fas ${spot.icon} text-cyan-400 ml-2"></i><b>${spot.label}</b>
+                    <div class="text-xs text-gray-500 mt-1">${used?'تم فحص هذه النقطة':'اضغط للفحص'}</div>
+                </button>`;
+            }).join('');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function investigateSpot(areaType, index) {
+            const spots=INVESTIGATION_SPOTS[areaType] || [];
+            const spot=spots[index];
+            if(!spot) return;
+            const key=areaType+'-'+index;
+            if(state.searchedActions[key]) return;
+            state.searchedActions[key]=true;
+
+            let found = state.currentCase.evidence.find(e=>!e.isDiscovered && spot.types.includes(e.type));
+            if(!found && spot.types.length) {
+                found = state.currentCase.evidence.find(e=>!e.isDiscovered && (
+                    (areaType==='timeline' && ['Access Log','Phone Record','Camera Footage','Timeline'].includes(e.type)) ||
+                    (areaType==='location' && ['Physical','Receipt','Witness Statement','Vehicle'].includes(e.type)) ||
+                    (areaType==='documents' && ['Document','Access Log','Phone Record','Email','Receipt'].includes(e.type)) ||
+                    (areaType==='cameras' && ['Camera Footage','Photo','Access Log'].includes(e.type))
+                ));
+            }
+
+            closeModal('modal-scan');
+            if(found) {
+                found.isDiscovered=true;
+                state.discoveredEvidence.push(found);
+                document.getElementById('found-ev-title').innerText='أثر جديد — يحتاج إلى تحليل';
+                document.getElementById('modal-found').classList.remove('hidden');
+                document.getElementById('modal-found').classList.add('flex');
+                renderDiscoveredEvidence();
+                populateAccusationForm();
+            } else {
+                document.getElementById('info-msg-text').innerText='فحصتم هذه النقطة ولم تجدوا شيئًا مفيدًا حتى الآن. جرّبوا زاوية أخرى أو اربطوا ما لديكم من أدلة.';
+                document.getElementById('modal-info').classList.remove('hidden');
+                document.getElementById('modal-info').classList.add('flex');
+            }
+        }
+
+        function renderDiscoveredEvidence() {
+            const list = document.getElementById('discovered-evidence-list');
+            list.innerHTML = '';
+            
+            if(state.discoveredEvidence.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-sm italic">لم يتم اكتشاف أدلة بعد...</p>';
+                return;
+            }
+
+            state.discoveredEvidence.forEach(e => {
+                list.innerHTML += `
+                    <div onclick="showEvidenceDetails('${e.id}')" class="bg-blue-900/20 border border-blue-500/30 p-3 rounded cursor-pointer hover:bg-blue-800/40 transition flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-blue-300 text-sm">${e.title}</div>
+                            <div class="text-xs text-gray-400 font-en">${e.type}</div>
+                        </div>
+                        <i class="fas fa-search text-gray-500"></i>
+                    </div>
+                `;
+            });
+            renderSuspectsGrid();
+        }
+
+        function showEvidenceDetails(id) {
+            const ev = state.discoveredEvidence.find(e => e.id === id);
+            if(!ev) return;
+            document.getElementById('mod-ev-type').innerText = ev.type;
+            document.getElementById('mod-ev-title').innerText = ev.title;
+            document.getElementById('mod-ev-desc').innerText = ev.description;
+            document.getElementById('mod-ev-loc').innerText = ev.location;
+            document.getElementById('mod-ev-time').innerText = ev.timestamp;
+            document.getElementById('modal-evidence').classList.remove('hidden');
+            document.getElementById('modal-evidence').classList.add('flex');
+        }
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            }
+        }
+
+        let currentSuspect = null;
+
+        function renderSuspectsGrid() {
+            const grid = document.getElementById('suspects-grid');
+            if(!grid || !state.currentCase) return;
+            grid.innerHTML = '';
+            
+            state.currentCase.suspects.forEach(s => {
+                grid.innerHTML += `
+                    <div class="glass p-5 rounded-xl border border-cyan-900/50 flex flex-col gap-3 relative">
+                        <div class="flex items-center gap-4 border-b border-white/10 pb-3">
+                            <div class="w-16 h-16 rounded-full bg-gray-800 border border-gray-600 flex justify-center items-center text-2xl text-gray-400 shrink-0">
+                                <i class="fas fa-user-secret"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">${s.name}</h3>
+                                <p class="text-sm text-cyan-400">${s.occupation}</p>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-300 flex-1">
+                            <p class="mb-2"><strong class="text-gray-400">الخلفية:</strong> ${s.background}</p>
+                            <p class="mb-2"><strong class="text-gray-400">الإفادة الأولية:</strong> ${s.statement}</p>
+                        </div>
+                        <button onclick="startInterrogation('${s.id}')" class="glass-btn w-full py-2 rounded text-cyan-300 font-bold border-cyan-500/50 hover:bg-cyan-900/30">
+                            بدء الاستجواب <i class="fas fa-microphone-alt mr-2"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function startInterrogation(id) {
+            currentSuspect = state.currentCase.suspects.find(x => x.id === id);
+            
+            document.getElementById('inter-suspect-name').innerText = currentSuspect.name;
+            document.getElementById('inter-suspect-job').innerText = currentSuspect.occupation;
+            
+            updateSuspectUI(currentSuspect);
+            
+            document.getElementById('inter-chat-log').innerHTML = '<div class="text-center text-gray-500 text-sm mb-4">-- بدأ الاستجواب --</div>';
+            switchScreen('screen-interrogation');
+        }
+
+        function updateSuspectUI(s) {
+            document.getElementById('inter-stress-bar').style.width = s.baseStress + "%";
+            document.getElementById('inter-stress-val').innerText = s.baseStress + "%";
+            
+            document.getElementById('inter-coop-bar').style.width = s.baseCoop + "%";
+            document.getElementById('inter-coop-val').innerText = s.baseCoop + "%";
+            
+            let status = "CALM";
+            let color = "text-green-400";
+            if(s.baseStress > 40) { status = "UNEASY"; color = "text-yellow-400"; }
+            if(s.baseStress > 70) { status = "NERVOUS"; color = "text-orange-400"; }
+            if(s.baseStress > 85) { status = "HIGHLY STRESSED"; color = "text-red-500"; }
+            
+            const stEl = document.getElementById('inter-status-text');
+            stEl.innerText = status;
+            stEl.className = `font-bold ${color}`;
+        }
+
+        async function callInterrogationAI(payload) {
+            const response = await fetch('/api/interrogate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    caseId: state.currentCase.id,
+                    suspectId: payload.suspect.id,
+                    discoveredEvidence: payload.evidence.map(e => e.id),
+                    question: payload.question,
+                    chatHistory: payload.chatHistory || [],
+                    stress: payload.suspect.baseStress
+                })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || 'فشل الاستجواب');
+            return data;
+        }
+
+        async function sendInterrogation() {
+            const input = document.getElementById('inter-input');
+            const q = input.value.trim();
+            if(!q) return;
+            input.value = '';
+            appendChatMessage('inter-chat-log', q, true);
+            const payload = { suspect: currentSuspect, evidence: state.discoveredEvidence, question: q, chatHistory: [] };
+            const typingId = appendChatMessage('inter-chat-log', '...', false, true);
+            try {
+                const res = await callInterrogationAI(payload);
+                document.getElementById(typingId)?.remove();
+                appendChatMessage('inter-chat-log', res.text, false);
+                currentSuspect.baseStress = res.newStress;
+                updateSuspectUI(currentSuspect);
+                if(voiceEnabled) playTTS(res.text, currentSuspect.baseStress);
+            } catch (error) {
+                document.getElementById(typingId)?.remove();
+                appendChatMessage('inter-chat-log', 'تعذر الاتصال بمساعد الاستجواب.', false);
+                console.error(error);
+            }
+        }
+
+        function appendChatMessage(containerId, text, isUser, isTyping = false) {
+            const id = 'msg-' + Math.random().toString(36).substr(2, 9);
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = `p-3 rounded-lg max-w-[80%] ${isUser ? 'bg-cyan-900/40 border border-cyan-500/30 self-end text-cyan-50' : 'bg-gray-800 border border-gray-600 self-start text-gray-200'} dir-rtl`;
+            div.innerText = text;
+            if(isTyping) div.classList.add('animate-pulse', 'text-gray-500');
+            
+            const container = document.getElementById(containerId);
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+
+        let voiceEnabled = false;
+        function toggleVoice() {
+            voiceEnabled = !voiceEnabled;
+            const btn = document.getElementById('btn-voice');
+            if(voiceEnabled) {
+                btn.classList.add('text-cyan-400');
+                btn.classList.remove('text-gray-400');
+            } else {
+                btn.classList.add('text-gray-400');
+                btn.classList.remove('text-cyan-400');
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function playTTS(text, stressLevel) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'ar-SA';
+            
+            if (stressLevel > 80) {
+                msg.rate = 1.3;
+                msg.pitch = 1.2;
+            } else if (stressLevel > 50) {
+                msg.rate = 1.1;
+                msg.pitch = 1.1;
+            } else {
+                msg.rate = 0.9;
+                msg.pitch = 1.0;
+            }
+            
+            window.speechSynthesis.speak(msg);
+        }
+
+        function renderTeamChat() {
+            const log = document.getElementById('team-chat-log');
+            log.innerHTML = '';
+            state.teamChat.forEach(msg => {
+                log.innerHTML += `
+                    <div class="bg-purple-900/20 border border-purple-500/30 p-3 rounded-lg max-w-[80%] ${msg.player === document.getElementById('team-player-select').value ? 'self-end' : 'self-start'} dir-rtl">
+                        <div class="text-xs text-purple-400 mb-1">${msg.player}</div>
+                        <div>${msg.text}</div>
+                    </div>
+                `;
+            });
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function sendTeamMessage() {
+            const input = document.getElementById('team-input');
+            const txt = input.value.trim();
+            if(!txt) return;
+            const player = document.getElementById('team-player-select').value;
+            state.teamChat.push({ player, text: txt });
+            input.value = '';
+            renderTeamChat();
+        }
+
+        async function callInvestigationAI(payload) {
+            const response = await fetch('/api/assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    caseId: state.currentCase.id,
+                    question: payload.question,
+                    discoveredEvidence: payload.evidence.map(e => e.id),
+                    chatHistory: []
+                })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || 'فشل مساعد التحقيق');
+            return data.answer;
+        }
+
+        async function sendAssistant() {
+            const input = document.getElementById('ai-input');
+            const q = input.value.trim();
+            if(!q) return;
+            input.value = '';
+            appendChatMessage('ai-chat-log', q, true);
+            const typingId = appendChatMessage('ai-chat-log', '...', false, true);
+            try {
+                const res = await callInvestigationAI({ question: q, evidence: state.discoveredEvidence });
+                document.getElementById(typingId)?.remove();
+                appendChatMessage('ai-chat-log', res, false);
+            } catch (error) {
+                document.getElementById(typingId)?.remove();
+                appendChatMessage('ai-chat-log', 'تعذر الاتصال بمساعد التحقيق.', false);
+                console.error(error);
+            }
+        }
+
+        let boardNodes = [];
+        let isDragging = false;
+        let dragNode = null;
+        let connectStartNode = null;
+
+        function initBoard() {
+            const container = document.getElementById('board-nodes');
+            container.innerHTML = '';
+            boardNodes = [];
+            
+            state.currentCase.suspects.forEach((s, i) => {
+                createNode(s.id, s.name, 'Suspect', 50 + (i*150), 50);
+            });
+            
+            state.discoveredEvidence.forEach((e, i) => {
+                createNode(e.id, e.title, e.type, 50 + (i*120), 250);
+            });
+            
+            drawConnections();
+        }
+
+        function createNode(id, text, type, x, y) {
+            const div = document.createElement('div');
+            div.className = `evidence-node glass px-4 py-2 rounded border ${type==='Suspect'?'border-cyan-500':'border-yellow-500'} text-sm cursor-pointer select-none`;
+            div.innerText = text;
+            div.style.left = x + 'px';
+            div.style.top = y + 'px';
+            div.dataset.id = id;
+            
+            div.onmousedown = (e) => {
+                if(e.shiftKey) {
+                    if(!connectStartNode) {
+                        connectStartNode = id;
+                        div.classList.add('ring-2', 'ring-purple-500');
+                    } else {
+                        if(connectStartNode !== id) {
+                            state.connections.push([connectStartNode, id]);
+                            drawConnections();
+                        }
+                        document.querySelector(`[data-id="${connectStartNode}"]`).classList.remove('ring-2', 'ring-purple-500');
+                        connectStartNode = null;
+                    }
+                } else {
+                    isDragging = true;
+                    dragNode = div;
+                }
+            };
+            
+            document.getElementById('board-nodes').appendChild(div);
+            boardNodes.push(div);
+        }
+
+        document.getElementById('board-nodes').onmousemove = (e) => {
+            if(isDragging && dragNode) {
+                const rect = document.getElementById('board-container').getBoundingClientRect();
+                dragNode.style.left = (e.clientX - rect.left - 20) + 'px';
+                dragNode.style.top = (e.clientY - rect.top - 20) + 'px';
+                drawConnections();
+            }
+        };
+        document.getElementById('board-nodes').onmouseup = () => { isDragging = false; dragNode = null; };
+        document.getElementById('board-nodes').onmouseleave = () => { isDragging = false; dragNode = null; };
+
+        function drawConnections() {
+            const canvas = document.getElementById('board-canvas');
+            const container = document.getElementById('board-container');
+            if(!canvas || !container) return;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#8B5CF6';
+            ctx.lineWidth = 2;
+            
+            state.connections.forEach(conn => {
+                const n1 = document.querySelector(`[data-id="${conn[0]}"]`);
+                const n2 = document.querySelector(`[data-id="${conn[1]}"]`);
+                if(n1 && n2) {
+                    ctx.beginPath();
+                    ctx.moveTo(parseInt(n1.style.left) + n1.offsetWidth/2, parseInt(n1.style.top) + n1.offsetHeight/2);
+                    ctx.lineTo(parseInt(n2.style.left) + n2.offsetWidth/2, parseInt(n2.style.top) + n2.offsetHeight/2);
+                    ctx.stroke();
+                }
+            });
+        }
+
+        function populateAccusationForm() {
+            const suspSelect = document.getElementById('accuse-suspect');
+            const evSelect = document.getElementById('accuse-evidence');
+            
+            suspSelect.innerHTML = '<option value="">-- اختر المشتبه به --</option>';
+            state.currentCase.suspects.forEach(s => {
+                suspSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+            });
+
+            evSelect.innerHTML = '<option value="">-- اختر الدليل --</option>';
+            state.discoveredEvidence.forEach(e => {
+                evSelect.innerHTML += `<option value="${e.id}">${e.title}</option>`;
+            });
+        }
+
+        async function submitAccusation() {
+            const suspId = document.getElementById('accuse-suspect').value;
+            const evId = document.getElementById('accuse-evidence').value;
+            if(!suspId || !evId) { alert("يجب اختيار مشتبه به ودليل رئيسي."); return; }
+            clearInterval(state.timerInterval);
+            try {
+                const response = await fetch('/api/accuse', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ caseId: state.currentCase.id, suspectId: suspId, evidenceId: evId, timer: state.timer })
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) throw new Error(data.error || 'فشل التحقق');
+                let resultHtml = '';
+                if(data.solved) {
+                    const score = data.score || 0;
+                    if(!state.solved.includes(state.currentCase.id)) state.solved.push(state.currentCase.id);
+                    if(data.nextCaseId && !state.unlocked.includes(data.nextCaseId)) state.unlocked.push(data.nextCaseId);
+                    resultHtml = `
+                        <h2 class="text-4xl font-bold text-green-400 mb-4"><i class="fas fa-check-circle"></i> تم حل القضية</h2>
+                        <p class="text-gray-300 mb-6 text-lg">أحسنت! استنتاجك صحيح.</p>
+                        <div class="bg-black/50 p-4 rounded text-right mb-6 text-sm text-gray-300 leading-relaxed border-r-4 border-green-500">
+                            <strong>التفسير:</strong> ${data.explanation || 'تم إثبات الاتهام بالقرائن المطلوبة.'}
+                        </div>
+                        <div class="text-3xl font-en text-glow-blue font-bold mb-8">SCORE: ${score}</div>`;
+                } else {
+                    resultHtml = `
+                        <h2 class="text-4xl font-bold text-red-500 mb-4"><i class="fas fa-times-circle"></i> فشل التحقيق</h2>
+                        <p class="text-gray-300 mb-6 text-lg">الاتهام خاطئ أو الأدلة غير كافية لإثبات التهمة.</p>
+                        <div class="bg-black/50 p-4 rounded text-right mb-6 text-sm text-gray-300 leading-relaxed border-r-4 border-red-500">أعد النظر في الأدلة المكتشفة وتناقضات الأقوال.</div>`;
+                }
+                resultHtml += `<button onclick="saveAndExit()" class="glass-btn px-8 py-3 rounded-lg font-bold">العودة للخريطة</button>`;
+                document.getElementById('result-card').innerHTML = resultHtml;
+                saveGame();
+                switchScreen('screen-result');
+            } catch (error) {
+                console.error(error);
+                alert('تعذر الاتصال بالسيرفر للتحقق من الاتهام.');
+            }
+        }
+
+        function saveGame() {
+            const saveObj = { unlocked: state.unlocked, solved: state.solved };
+            localStorage.setItem('serialTraceSave', JSON.stringify(saveObj));
+        }
+
+        function loadSave() {
+            try {
+                const data = localStorage.getItem('serialTraceSave');
+                if(!data) return;
+                const parsed = JSON.parse(data);
+                state.unlocked = Array.isArray(parsed.unlocked) ? parsed.unlocked : ["CASE-001"];
+                state.solved = Array.isArray(parsed.solved) ? parsed.solved : [];
+            } catch (error) {
+                console.warn('تعذر تحميل الحفظ السابق، سيتم بدء حفظ جديد.', error);
+                localStorage.removeItem('serialTraceSave');
+                state.unlocked = ["CASE-001"];
+                state.solved = [];
+            }
+        }
+        
+        function resetSave() {
+            if(confirm("هل أنت متأكد من مسح كل تقدمك؟")) {
+                localStorage.removeItem('serialTraceSave');
+                window.location.reload();
+            }
+        }
+
+        function saveAndExit() {
+            saveGame();
+            renderCases();
+            switchScreen('screen-map');
+        }
+
+        window.addEventListener('beforeunload', () => {
+            try { saveGame(); } catch (_) {}
+        });
+
+        // Run Init
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
