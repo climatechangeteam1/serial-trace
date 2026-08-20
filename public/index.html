@@ -174,13 +174,37 @@
             z-index: 10;
         }
 
-        /* Screens that contain their own internal scroll areas */
-        #screen-investigation,
-        #screen-interrogation,
-        #screen-assistant,
-        #screen-team-chat {
-            overflow: hidden;
-        }
+     /* =========================================================
+   GLOBAL PAGE SCROLL — ALL SCREENS
+   ========================================================= */
+
+.screen {
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+/* Investigation and communication pages must also allow
+   the whole page to scroll when their content becomes tall. */
+#screen-investigation,
+#screen-interrogation,
+#screen-assistant,
+#screen-team-chat,
+#screen-evidence-board {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+/* Keep the existing internal chat/evidence lists scrollable too */
+#discovered-evidence-list,
+#inter-chat-log,
+#ai-chat-log,
+#team-chat-log {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
 
         /* =========================================================
            SCROLLBARS
@@ -297,14 +321,6 @@
             overscroll-behavior: contain;
             -webkit-overflow-scrolling: touch;
         }
-
-        #inter-chat-log,
-        #ai-chat-log,
-        #team-chat-log {
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
         /* =========================================================
            MOBILE / TABLET
            ========================================================= */
